@@ -1,0 +1,40 @@
+class Main {
+
+	function void main() {
+	    var char key;  // the key currently pressed by the user
+        var boolean exit, randomize;
+		var NandMines nandMines;
+		var int counter;
+		
+		let exit = false;
+		let randomize = true;
+		let nandMines = NandMines.new();
+		 
+		while (~exit) {
+			// waits for a key to be pressed and released
+			while (key = 0) {
+				let counter = counter+1;
+				let key = Keyboard.keyPressed();
+			}
+			while (~(Keyboard.keyPressed() = 0)) {}
+			if(randomize){
+				do nandMines.randomizeBombs(counter);
+				let randomize = false;
+			}
+			if ((key = 81)|(key = 113))  { let exit = true; }      			// q key
+			if ((key = 82)|(key = 114))  { do nandMines.restart();	let randomize = true;}   	// r key
+			if (key = 130) { do nandMines.moveHorizontal(false); }  		// left arrow
+			if (key = 131) { do nandMines.moveVertical(false);}    			// up arrow
+			if (key = 132) { do nandMines.moveHorizontal(true); }   		// right arrow
+			if (key = 133) { do nandMines.moveVertical(true); }    			// down arrow
+			if (key = 139) { do nandMines.clearSquare(); }          		// supr key
+			if (key = 138) { do nandMines.toggleFlag(); }           		// insert key
+			let key = 0;
+		} 
+		
+		do nandMines.dispose();
+	 
+		return;
+	}
+	
+}

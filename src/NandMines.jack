@@ -1,0 +1,412 @@
+class NandMines {
+  
+	field Model model;
+	field boolean ended;
+	field int ci, cj; // cursor position
+	field int flags, hidden; //counters
+	
+	constructor NandMines new(){
+		do restart();
+		return this;
+	}
+			
+	method void restart(){
+		if(~(model=null)){
+			do model.dispose();
+		}
+		let model = Model.new();
+		let ended = false;
+		let ci = 0;
+		let cj = 0;
+		let flags = 0;
+		let hidden = model.getRows()*model.getColumns();
+		do View.drawFrame();
+		do View.showMessage("Press F1 for help");
+		do paintSquares();
+		do paintSelected();
+		return;
+	}
+	
+	method void randomizeBombs(int randomSeed){
+		do model.setBombs(10, randomSeed);
+		return;
+	}
+	
+	method void moveHorizontal(boolean right){
+		do moveHorizontalStartingIn(ci, cj, right);
+		return;
+	}
+	
+	method void moveHorizontalStartingIn(int i, int j, boolean right){
+		var Square s;
+	    var int k;
+		if(ended){
+			return;
+		}
+		if(right){
+			let k=i+1;
+		} else {
+			let k=i-1;
+		}
+		while((k<model.getColumns()) & (k>-1)){
+			let s = model.getSquare(k,j);
+			if(s.isHidden()){
+				do paintSquare(ci,cj);
+				let ci=k;
+				let cj=j;
+				do paintSelected();
+				return;
+			}
+			if(right){
+				let k=k+1;
+			} else {
+				let k=k-1;
+			}
+		}
+		
+		if(right){
+			if(j=(model.getRows()-1)){
+				let j = 0;
+			} else {
+				let j = j+1;
+			}
+			do moveHorizontalStartingIn(-1, j, right);
+		} else {
+			if(j=0){
+				let j = model.getRows()-1;
+			} else {
+				let j = j-1;
+			}
+			do moveHorizontalStartingIn(model.getColumns(), j, right);
+		}
+		
+		return;
+	}
+	method void moveVertical(boolean down){
+		do moveVerticalStartingIn(ci,cj,down);
+		return;
+	}
+	
+	method void moveVerticalStartingIn(int i, int j, boolean down){
+		var Square s;
+	    var int k;
+		if(ended){
+			return;
+		}
+	    if(down){
+			let k=j+1;
+		}else{
+			let k=j-1;
+		}
+		while((k<model.getRows()) & (k>-1)){
+			let s = model.getSquare(i,k);
+			if(s.isHidden()){
+				do paintSquare(ci,cj);
+				let ci=i;
+				let cj=k;
+				do paintSelected();
+				return;
+			}
+			if(down){
+				let k=k+1;
+			}else{
+				let k=k-1;
+			}
+		}
+		if(down){
+			if(i=(model.getColumns()-1)){
+				let i = 0;
+			} else {
+				let i = i+1;
+			}
+			do moveVerticalStartingIn(i, -1, down);
+		} else {
+			if(i=0){
+				let i = model.getColumns()-1;
+			} else {
+				let i = i-1;
+			}
+			do moveVerticalStartingIn(i, model.getRows(), down);
+		}
+		return;
+	}
+	
+	method void toggleFlag(){
+		var Square s;
+		if(ended){
+			return;
+		}
+		let s = model.getSquare(ci,cj);
+		do s.setFlag(~s.isFlag());
+		if(s.isFlag()){
+			let flags = flags+1;
+		} else {
+			let flags = flags-1;
+		}
+		do View.showLocatedBombsMessage(flags, model.getBombs());
+		do paintSelected();
+		do checkComplete();
+		return;
+	}
+	
+	method void clearSquare(){
+		var int i;
+		var Array visited;
+		var Square s;
+		if(ended){
+			return;
+		}
+		let s = model.getSquare(ci,cj);
+		if(s=null){
+			return;
+		}
+		do s.setHidden(false);
+		let hidden = hidden-1;
+		if(s.isFlag()){
+			let flags = flags-1;
+		}
+		if(s.isBomb()){
+			let ended=true;
+			do View.showMessage("BOOOM!  (press 'r' to restart)");
+			do paintSquares();
+		} else {
+			do paintSquare(ci,cj);
+			let visited = Array.new(model.getRows()*model.getColumns());
+			let i = 0;
+			while(i<(model.getRows()*model.getColumns())){
+			   let visited[i]=false;
+			   let i = i+1;
+			}
+			do clearBlanks(ci,cj,visited);
+			do visited.dispose();
+			do checkComplete();
+		}
+		return;
+	}
+
+	method void checkComplete(){
+		if((hidden=flags)&(hidden=model.getBombs())){
+			let ended=true;
+			do View.showMessage("Congratulations!");			
+		}
+		return;
+	}
+	
+	method void clearBlanks(int i, int j, Array visited){
+		var Square s;
+		var LinkedList queue;
+		let s = model.getSquare(i,j);
+		let queue = LinkedList.new();
+		do queue.addLast(s.getId());
+		while(queue.getSize()>0){
+			let s = model.getSquareById(queue.removeFirst());
+			if(~(s=null)){				
+				if(~s.isFlag()){
+					if(~visited[s.getId()]){
+						let visited[s.getId()]=true;
+						if(~s.isBomb()){
+							let i = Model.getColumn(s.getId());
+							let j = Model.getRow(s.getId());
+							if(s.isHidden()){
+								do s.setHidden(false);
+								let hidden = hidden-1;
+							}
+							do paintSquare(i,j);
+							if(getMines(i,j)=0){
+								do queue.addLast(Model.getId(i-1,j-1));
+								do queue.addLast(Model.getId(i-1,j));
+								do queue.addLast(Model.getId(i-1,j+1));
+								do queue.addLast(Model.getId(i,j-1));
+								do queue.addLast(Model.getId(i,j+1));
+								do queue.addLast(Model.getId(i+1,j-1));
+								do queue.addLast(Model.getId(i+1,j));
+								do queue.addLast(Model.getId(i+1,j+1));													
+							}
+						}
+					}
+				}
+				
+			}
+		}
+		do queue.dispose();
+		return;
+	}
+	
+	method int getMines(int i, int j){
+		var Square s;
+		var int sum;
+		let sum = 0;
+		let s = model.getSquare(i-1,j-1);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i-1,j);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i-1,j+1);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i,j-1);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i,j+1);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i+1,j-1);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i+1,j);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		let s = model.getSquare(i+1,j+1);
+		if(~(s=null)){
+			if(s.isBomb()){
+				let sum = sum+1;
+			}
+		}
+		return sum;
+	}
+	
+	method void paintSelected(){
+		var Square s;
+		let s = model.getSquare(ci,cj);
+		if(s.isFlag()){
+			do View.drawFlagSelected(NandMines.getSquarePosition(ci, cj));
+		} else {
+			do View.drawSelected(NandMines.getSquarePosition(ci, cj));
+		}
+		return;
+	}
+	
+	method void paintSquares(){
+		var int i,j;
+		let i = 0; 
+		while(i<model.getColumns()){
+			let j = 0;
+			while(j<model.getRows()){
+			   do paintSquare(i,j);
+			   let j=j+1;
+			}
+			let i=i+1;
+		}
+		return;
+	}
+	
+	method void paintSquare(int i, int j){
+		var int mines;
+		var Square s;
+		if(model=null){
+			return;
+		}
+		let s = model.getSquare(i,j);
+		if(s=null){
+			return;
+		}
+		if(s.isHidden()){
+			if(ended){
+				if(s.isFlag()){
+					if(s.isBomb()){
+						do View.drawFlag(NandMines.getSquarePosition(i,j));
+						return;
+					} else {
+						do View.drawFail(NandMines.getSquarePosition(i,j));
+						return;
+					}
+				} else {
+				    if(s.isBomb()){
+						do View.drawMine(NandMines.getSquarePosition(i,j));
+						return;
+					} else {
+						do View.drawHidden(NandMines.getSquarePosition(i,j));
+						return;
+					}
+				}
+			} else {
+				if(s.isFlag()){
+					do View.drawFlag(NandMines.getSquarePosition(i,j));
+					return;
+				} else {
+					do View.drawHidden(NandMines.getSquarePosition(i,j));
+					return;
+				}
+			}
+		} else {
+			if(s.isBomb()){
+				do View.drawExplosion(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			
+			let mines = getMines(i,j);
+			if(mines=0){
+				do View.drawBlank(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=1){
+				do View.draw1(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=2){
+				do View.draw2(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=3){
+				do View.draw3(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=4){
+				do View.draw4(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=5){
+				do View.draw5(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=6){
+				do View.draw6(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=7){
+				do View.draw7(NandMines.getSquarePosition(i,j));
+				return;
+			}
+			if(mines=8){
+				do View.draw8(NandMines.getSquarePosition(i,j));
+				return;
+			}
+		}
+		return;
+	}
+	
+	function int getSquarePosition(int i, int j) {
+	  var int marginX, marginY;
+	  let marginX = 1;
+	  let marginY = 4*16;
+	  return ((marginY + (j*16)) * 32) + marginX + i;
+   }
+   
+    /** Disposes this square. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+}

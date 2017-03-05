@@ -1,0 +1,124 @@
+class Model {
+  
+	static int BOMBS, SIZE, COLUMNS, ROWS;
+	field Array grid;
+	field int _bombs;
+	
+	constructor Model new(){
+		var int i;
+			
+		let BOMBS = 20;
+	    let COLUMNS = 30;
+	    let ROWS = 11;
+		let SIZE = COLUMNS*ROWS;
+	    let grid = Array.new(SIZE);
+		
+		let i = 0;
+		
+	    while(i<SIZE){
+           let grid[i]=Square.new(i);
+     		let i=i+1;
+	    }
+		
+		return this;
+	}
+	
+	method void setBombs(int bombs, int randomSeed){
+		var int i, r;
+		var Random rand;
+		var Square s;
+		
+		let _bombs = bombs;
+		let i = 0;
+		let rand = Random.new(randomSeed, SIZE-1);
+		while(i<bombs){
+			let r = rand.next();
+			let s = grid[r];
+			if(~s.isBomb()){
+				do s.setBomb(true);
+				let i=i+1;
+			} else {
+				do rand.dispose();
+				let rand = Random.new(r+757, SIZE-1);
+			}
+	    }
+		do rand.dispose();
+		return;
+	}
+		
+	method int getBombs(){
+		return _bombs;
+	}
+	
+	method Square getSquareById(int id){
+		if(id<0){
+			return null;
+		}
+		if(id>SIZE){
+			return null;
+		}
+		return grid[id];
+	}
+		
+    method Square getSquare(int i, int j){
+	    if(i<0){
+			return null;
+		}
+		if(j<0){
+			return null;
+		}
+		if(i>(COLUMNS-1)){
+			return null;
+		}
+		if(j>(ROWS-1)){
+			return null;
+		}
+		return grid[Model.getId(i,j)];
+	}
+	
+	function int getId(int i, int j){
+		if(i<0){
+			return -1;
+		}
+		if(j<0){
+			return -1;
+		}
+		if(i>(COLUMNS-1)){
+			return -1;
+		}
+		if(j>(ROWS-1)){
+			return -1;
+		}
+		return (j*COLUMNS) + i;
+	}
+	
+	function int getColumn(int id){
+		return id-(COLUMNS*Model.getRow(id));
+	}
+	
+	function int getRow(int id){
+		return id/COLUMNS;
+	}
+	
+	method void dispose () {
+	    var int i;
+		var Square s;
+	    let i = 0;
+	    while(i<SIZE){
+		    let s=grid[i];
+			do s.dispose();
+			let i=i+1;
+	    }
+		do grid.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+	
+	method int getColumns(){
+		return COLUMNS;
+	}
+	
+	method int getRows(){
+		return ROWS;
+	}
+}

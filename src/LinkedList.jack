@@ -1,0 +1,94 @@
+class LinkedList {
+  
+    field ListNode first;
+	field ListNode last;
+	field int size;
+	
+	constructor LinkedList new(){
+		let first = null;
+		let size = 0;
+		return this;
+	}
+	
+	/* Adds the item at the beginning of the list. */
+	method void addFirst(int value){
+		var ListNode node;
+		let node = ListNode.new(value);
+		if(size=0){
+			let last = node;
+		} else {
+			do node.setNext(first);
+		}
+		let first = node;
+		let size = size + 1;
+		return;
+	}
+	
+	/* Adds the item at the end of the list. */
+	method void addLast(int value){
+		var ListNode node;
+		let node = ListNode.new(value);
+		if(size=0){
+			let first = node;
+		} else {
+			do last.setNext(node);
+		}
+		let last = node;
+		let size = size + 1;
+		return;
+	}
+	
+   /* Removes and returns the first item of the list. */
+	method int removeFirst(){
+		var ListNode temp;
+		var int ret;
+		if(first=null){
+			let ret = -1; // exceptions I miss you...
+		} else {
+			let ret = first.getValue();
+			let temp = first;
+			let first = first.getNext();
+			do temp.dispose();
+			let size = size - 1;
+			if(size=0){
+				let last = null;
+			}
+		}
+		return ret;
+	}
+	
+	/* Removes and returns the first item of the list. */
+	method int removeLast(){
+		var ListNode temp;
+		var int ret;
+		if(last=null){
+			let ret = -1; // exceptions I miss you...
+		} else {
+			let ret = last.getValue();
+			let temp = last;
+			let last = last.getPrevious();
+			do temp.dispose();
+			let size = size - 1;
+			if(size=0){
+				let first = null;
+			}
+		}
+		return ret;
+	}
+	
+	method int getSize(){
+		return size;
+	}
+	
+	method void dispose () {
+		var ListNode node, temp;
+		let node = first;
+		if(~(node=null)){
+			let temp = node;
+			let node = node.getNext();
+			do temp.dispose();
+		}
+		do Memory.deAlloc(this);
+		return;
+	}
+}

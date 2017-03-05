@@ -1,0 +1,49 @@
+class Square {
+  
+    field int _id;
+	field boolean _bomb, _hidden, _flag;
+	
+	constructor Square new(int id){
+		let _id = id;
+		let _bomb = false;
+		let _flag = false;
+		let _hidden = true;
+		return this;
+	}
+	
+	method int getId(){
+		return _id;
+	}
+	
+	method boolean isFlag(){
+		return _flag;
+	}
+	
+	method void setBomb(boolean bomb){
+		let _bomb = bomb;
+		return;
+	}
+	
+	method void setFlag(boolean flag){
+		let _flag = flag;
+		return;
+	}
+	
+	method boolean isBomb(){
+		return _bomb;
+	}
+	
+	method boolean isHidden(){
+		return _hidden;
+	}
+	
+	method void setHidden(boolean hidden){
+		let _hidden = hidden;
+		return;
+	}
+	
+	method void dispose () {
+		do Memory.deAlloc(this);
+		return;
+	}
+}

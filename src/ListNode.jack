@@ -1,0 +1,45 @@
+class ListNode {
+  
+    field int _value;
+	field ListNode _previous;
+	field ListNode _next;
+	
+	constructor ListNode new(int value){
+		let _value = value;
+		let _next = null;
+		let _previous = null;
+		return this;
+	}
+	
+	method void setValue(int value){
+		let _value = value;
+		return;
+	}
+	
+	method void setNext(ListNode next){
+		let _next = next;
+		return;
+	}
+	
+	method void setPrevious(ListNode previous){
+		let _previous = previous;
+		return;
+	}
+	
+	method ListNode getPrevious(){
+		return _previous;
+	}
+	
+	method int getValue(){
+		return _value;
+	}
+	
+	method ListNode getNext(){
+		return _next;
+	}
+	
+	method void dispose () {
+		do Memory.deAlloc(this);
+		return;
+	}
+}

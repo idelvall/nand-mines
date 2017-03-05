@@ -1,0 +1,32 @@
+
+
+class Random {
+    field int _seed;
+	field int _range;
+	
+    constructor Random new(int seed, int range) {
+		let _seed = seed;
+		let _range = range;
+		do next();
+  		
+        return this;
+    }
+		
+    function int mod(int a, int b) { 
+        return a - (b * (a/b)); 
+    } 
+
+    method int next() {
+        let _seed = Random.mod(_seed * 8017, _range);
+		if (_seed < 0){
+			let _seed = Random.mod(-_seed, _range);
+		}
+	    return _seed;
+    }
+
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+}
