@@ -1,412 +1,483 @@
+/*
+ * Copyright 2017 Ignacio del Valle Alles idelvall@brutusin.org.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * NandMines application controller.
+ * Overall the application (i,j) indexes are used for columns and rows respectively, starting from 0.
+ */
 class NandMines {
   
-	field Model model;
-	field boolean ended;
-	field int ci, cj; // cursor position
-	field int flags, hidden; //counters
-	
-	constructor NandMines new(){
-		do restart();
-		return this;
-	}
-			
-	method void restart(){
-		if(~(model=null)){
-			do model.dispose();
-		}
-		let model = Model.new();
-		let ended = false;
-		let ci = 0;
-		let cj = 0;
-		let flags = 0;
-		let hidden = model.getRows()*model.getColumns();
-		do View.drawFrame();
-		do View.showMessage("Press F1 for help");
-		do paintSquares();
-		do paintSelected();
-		return;
-	}
-	
-	method void randomizeBombs(int randomSeed){
-		do model.setBombs(10, randomSeed);
-		return;
-	}
-	
-	method void moveHorizontal(boolean right){
-		do moveHorizontalStartingIn(ci, cj, right);
-		return;
-	}
-	
-	method void moveHorizontalStartingIn(int i, int j, boolean right){
-		var Square s;
-	    var int k;
-		if(ended){
-			return;
-		}
-		if(right){
-			let k=i+1;
-		} else {
-			let k=i-1;
-		}
-		while((k<model.getColumns()) & (k>-1)){
-			let s = model.getSquare(k,j);
-			if(s.isHidden()){
-				do paintSquare(ci,cj);
-				let ci=k;
-				let cj=j;
-				do paintSelected();
-				return;
-			}
-			if(right){
-				let k=k+1;
-			} else {
-				let k=k-1;
-			}
-		}
-		
-		if(right){
-			if(j=(model.getRows()-1)){
-				let j = 0;
-			} else {
-				let j = j+1;
-			}
-			do moveHorizontalStartingIn(-1, j, right);
-		} else {
-			if(j=0){
-				let j = model.getRows()-1;
-			} else {
-				let j = j-1;
-			}
-			do moveHorizontalStartingIn(model.getColumns(), j, right);
-		}
-		
-		return;
-	}
-	method void moveVertical(boolean down){
-		do moveVerticalStartingIn(ci,cj,down);
-		return;
-	}
-	
-	method void moveVerticalStartingIn(int i, int j, boolean down){
-		var Square s;
-	    var int k;
-		if(ended){
-			return;
-		}
-	    if(down){
-			let k=j+1;
-		}else{
-			let k=j-1;
-		}
-		while((k<model.getRows()) & (k>-1)){
-			let s = model.getSquare(i,k);
-			if(s.isHidden()){
-				do paintSquare(ci,cj);
-				let ci=i;
-				let cj=k;
-				do paintSelected();
-				return;
-			}
-			if(down){
-				let k=k+1;
-			}else{
-				let k=k-1;
-			}
-		}
-		if(down){
-			if(i=(model.getColumns()-1)){
-				let i = 0;
-			} else {
-				let i = i+1;
-			}
-			do moveVerticalStartingIn(i, -1, down);
-		} else {
-			if(i=0){
-				let i = model.getColumns()-1;
-			} else {
-				let i = i-1;
-			}
-			do moveVerticalStartingIn(i, model.getRows(), down);
-		}
-		return;
-	}
-	
-	method void toggleFlag(){
-		var Square s;
-		if(ended){
-			return;
-		}
-		let s = model.getSquare(ci,cj);
-		do s.setFlag(~s.isFlag());
-		if(s.isFlag()){
-			let flags = flags+1;
-		} else {
-			let flags = flags-1;
-		}
-		do View.showLocatedBombsMessage(flags, model.getBombs());
-		do paintSelected();
-		do checkComplete();
-		return;
-	}
-	
-	method void clearSquare(){
-		var int i;
-		var Array visited;
-		var Square s;
-		if(ended){
-			return;
-		}
-		let s = model.getSquare(ci,cj);
-		if(s=null){
-			return;
-		}
-		do s.setHidden(false);
-		let hidden = hidden-1;
-		if(s.isFlag()){
-			let flags = flags-1;
-		}
-		if(s.isBomb()){
-			let ended=true;
-			do View.showMessage("BOOOM!  (press 'r' to restart)");
-			do paintSquares();
-		} else {
-			do paintSquare(ci,cj);
-			let visited = Array.new(model.getRows()*model.getColumns());
-			let i = 0;
-			while(i<(model.getRows()*model.getColumns())){
-			   let visited[i]=false;
-			   let i = i+1;
-			}
-			do clearBlanks(ci,cj,visited);
-			do visited.dispose();
-			do checkComplete();
-		}
-		return;
-	}
+    field Model model;	     // game data 
+    field boolean ended;     // game over
+    field int ci, cj;        // current position (selected square)
+    field int flags, hidden; // counters
 
-	method void checkComplete(){
-		if((hidden=flags)&(hidden=model.getBombs())){
-			let ended=true;
-			do View.showMessage("Congratulations!");			
-		}
-		return;
-	}
-	
-	method void clearBlanks(int i, int j, Array visited){
-		var Square s;
-		var LinkedList queue;
-		let s = model.getSquare(i,j);
-		let queue = LinkedList.new();
-		do queue.addLast(s.getId());
-		while(queue.getSize()>0){
-			let s = model.getSquareById(queue.removeFirst());
-			if(~(s=null)){				
-				if(~s.isFlag()){
-					if(~visited[s.getId()]){
-						let visited[s.getId()]=true;
-						if(~s.isBomb()){
-							let i = Model.getColumn(s.getId());
-							let j = Model.getRow(s.getId());
-							if(s.isHidden()){
-								do s.setHidden(false);
-								let hidden = hidden-1;
-							}
-							do paintSquare(i,j);
-							if(getMines(i,j)=0){
-								do queue.addLast(Model.getId(i-1,j-1));
-								do queue.addLast(Model.getId(i-1,j));
-								do queue.addLast(Model.getId(i-1,j+1));
-								do queue.addLast(Model.getId(i,j-1));
-								do queue.addLast(Model.getId(i,j+1));
-								do queue.addLast(Model.getId(i+1,j-1));
-								do queue.addLast(Model.getId(i+1,j));
-								do queue.addLast(Model.getId(i+1,j+1));													
-							}
-						}
-					}
-				}
-				
-			}
-		}
-		do queue.dispose();
-		return;
-	}
-	
-	method int getMines(int i, int j){
-		var Square s;
-		var int sum;
-		let sum = 0;
-		let s = model.getSquare(i-1,j-1);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i-1,j);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i-1,j+1);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i,j-1);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i,j+1);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i+1,j-1);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i+1,j);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		let s = model.getSquare(i+1,j+1);
-		if(~(s=null)){
-			if(s.isBomb()){
-				let sum = sum+1;
-			}
-		}
-		return sum;
-	}
-	
-	method void paintSelected(){
-		var Square s;
-		let s = model.getSquare(ci,cj);
-		if(s.isFlag()){
-			do View.drawFlagSelected(NandMines.getSquarePosition(ci, cj));
-		} else {
-			do View.drawSelected(NandMines.getSquarePosition(ci, cj));
-		}
-		return;
-	}
-	
-	method void paintSquares(){
-		var int i,j;
-		let i = 0; 
-		while(i<model.getColumns()){
-			let j = 0;
-			while(j<model.getRows()){
-			   do paintSquare(i,j);
-			   let j=j+1;
-			}
-			let i=i+1;
-		}
-		return;
-	}
-	
-	method void paintSquare(int i, int j){
-		var int mines;
-		var Square s;
-		if(model=null){
-			return;
-		}
-		let s = model.getSquare(i,j);
-		if(s=null){
-			return;
-		}
-		if(s.isHidden()){
-			if(ended){
-				if(s.isFlag()){
-					if(s.isBomb()){
-						do View.drawFlag(NandMines.getSquarePosition(i,j));
-						return;
-					} else {
-						do View.drawFail(NandMines.getSquarePosition(i,j));
-						return;
-					}
-				} else {
-				    if(s.isBomb()){
-						do View.drawMine(NandMines.getSquarePosition(i,j));
-						return;
-					} else {
-						do View.drawHidden(NandMines.getSquarePosition(i,j));
-						return;
-					}
-				}
-			} else {
-				if(s.isFlag()){
-					do View.drawFlag(NandMines.getSquarePosition(i,j));
-					return;
-				} else {
-					do View.drawHidden(NandMines.getSquarePosition(i,j));
-					return;
-				}
-			}
-		} else {
-			if(s.isBomb()){
-				do View.drawExplosion(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			
-			let mines = getMines(i,j);
-			if(mines=0){
-				do View.drawBlank(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=1){
-				do View.draw1(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=2){
-				do View.draw2(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=3){
-				do View.draw3(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=4){
-				do View.draw4(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=5){
-				do View.draw5(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=6){
-				do View.draw6(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=7){
-				do View.draw7(NandMines.getSquarePosition(i,j));
-				return;
-			}
-			if(mines=8){
-				do View.draw8(NandMines.getSquarePosition(i,j));
-				return;
-			}
-		}
-		return;
-	}
-	
-	function int getSquarePosition(int i, int j) {
-	  var int marginX, marginY;
-	  let marginX = 1;
-	  let marginY = 4*16;
-	  return ((marginY + (j*16)) * 32) + marginX + i;
-   }
+    constructor NandMines new(){
+        do restart();
+        return this;
+    }
+
+    /** Execution entry point. */
+    function void run() {
+        var char key;  // the key currently pressed by the user
+        var boolean exit, randomize;
+        var NandMines nandMines;
+        var int counter; // used as randomization seed
+
+        let exit = false;
+        let randomize = true;
+        let nandMines = NandMines.new();
+
+        while (~exit) {
+            // waits for a key to be pressed and released
+            while (key = 0) {
+                let counter = counter + 1;
+                let key = Keyboard.keyPressed();
+            }
+            while (~(Keyboard.keyPressed() = 0)) {}
+            if(randomize){
+                do nandMines.randomizeBombs(counter);
+                let randomize = false;
+            }
+            if ((key = 81)|(key = 113))  { let exit = true; }      // q key
+            if ((key = 82)|(key = 114))  {                         // r key
+                do nandMines.restart();    
+                let randomize = true;
+            }       
+            if (key = 130) { do nandMines.moveHorizontal(false); } // left arrow
+            if (key = 131) { do nandMines.moveVertical(false);}    // up arrow
+            if (key = 132) { do nandMines.moveHorizontal(true); }  // right arrow
+            if (key = 133) { do nandMines.moveVertical(true); }    // down arrow
+            if (key = 139) { do nandMines.clearSquare(); }         // supr key
+            if (key = 138) { do nandMines.toggleFlag(); }          // insert key
+            let key = 0;
+        } 
+
+        do nandMines.dispose();
+
+        return;
+    }
+
+    /** Starts a new game. */
+    method void restart(){
+        if(~(model = null)){
+            do model.dispose();
+        }
+        let model = Model.new();
+        let ended = false;
+        let ci = 0;
+        let cj = 0;
+        let flags = 0;
+        let hidden = model.getRows() * model.getColumns();
+        do View.drawFrame();
+        do View.showMessage("Press F1 for help");
+        do paintSquares();
+        do paintSelected();
+        return;
+    }
+
+    /** Randomly places the bombs over the model. */
+    method void randomizeBombs(int randomSeed){
+        do model.setBombs(50, randomSeed);
+        return;
+    }
+
+    /** Left/right movements of the currently selected square. */
+    method void moveHorizontal(boolean right){
+        do moveHorizontalStartingIn(ci, cj, right);
+        return;
+    }
+
+    /** Left/right movements to a valid (hidden) square from the specified coordinates. */
+    method void moveHorizontalStartingIn(int i, int j, boolean right){
+        var Square s;
+        var int k;
+        if(ended){
+            return;
+        }
+        if(right){
+            let k = i + 1;
+        } else {
+            let k = i - 1;
+        }
+        while((k < model.getColumns()) & (k >  - 1)){
+            let s = model.getSquare(k,j);
+            if(s.isHidden()){
+                do paintSquare(ci,cj);
+                let ci = k;
+                let cj = j;
+                do paintSelected();
+                return;
+            }
+            if(right){
+                let k = k + 1;
+            } else {
+                let k = k - 1;
+            }
+        }
+
+        if(right){
+            if(j = (model.getRows() - 1)){
+                let j = 0;
+            } else {
+                let j = j + 1;
+            }
+            do moveHorizontalStartingIn( - 1, j, right);
+        } else {
+            if(j = 0){
+                let j = model.getRows() - 1;
+            } else {
+                let j = j - 1;
+            }
+            do moveHorizontalStartingIn(model.getColumns(), j, right);
+        }
+        return;
+    }
+
+    /** Up/down movements of the currently selected square. */
+    method void moveVertical(boolean down){
+        do moveVerticalStartingIn(ci,cj,down);
+        return;
+    }
+
+    /** Up/down movements to a valid (hidden) square from the specified coordinates. */
+    method void moveVerticalStartingIn(int i, int j, boolean down){
+        var Square s;
+        var int k;
+        if(ended){
+            return;
+        }
+        if(down){
+            let k = j + 1;
+        }else{
+            let k = j - 1;
+        }
+        while((k<model.getRows()) & (k> - 1)){
+            let s = model.getSquare(i,k);
+            if(s.isHidden()){
+                do paintSquare(ci,cj);
+                let ci = i;
+                let cj = k;
+                do paintSelected();
+                return;
+            }
+            if(down){
+                let k = k + 1;
+            }else{
+                let k = k - 1;
+            }
+        }
+        if(down){
+            if(i = (model.getColumns() - 1)){
+                let i = 0;
+            } else {
+                let i = i + 1;
+            }
+            do moveVerticalStartingIn(i,  - 1, down);
+        } else {
+            if(i = 0){
+                let i = model.getColumns() - 1;
+            } else {
+                let i = i - 1;
+            }
+            do moveVerticalStartingIn(i, model.getRows(), down);
+        }
+        return;
+    }
+
+    /** Put/remove a flag in the current active position. */
+    method void toggleFlag(){
+        var Square s;
+        if(ended){
+            return;
+        }
+        let s = model.getSquare(ci,cj);
+        do s.setFlag(~s.isFlag());
+        if(s.isFlag()){
+                let flags = flags + 1;
+        } else {
+                let flags = flags - 1;
+        }
+        do View.showLocatedBombsMessage(flags, model.getBombs());
+        do paintSelected();
+        do checkComplete();
+        return;
+    }
+
+    /** Reveals the content of the currenly selected square. */
+    method void clearSquare(){
+        var int i;        
+        var Square s;
+        if(ended){
+            return;
+        }
+        let s = model.getSquare(ci,cj);
+        if(s = null){
+            return;
+        }
+        do s.setHidden(false);
+        let hidden = hidden - 1;
+        if(s.isFlag()){
+            let flags = flags - 1;
+        }
+        if(s.isBomb()){
+            let ended=true;
+            do View.showMessage("BOOOM!  (press 'r' to restart)");
+            do paintSquares();
+        } else {
+            do paintSquare(ci,cj);
+            do clearBlanks();
+            do checkComplete();
+        }
+        return;
+    }
+
+    /** Checks if the game has been completed. */
+    method void checkComplete(){
+        if((hidden = flags) & (hidden = model.getBombs())){
+            let ended=true;
+            do View.showMessage("Congratulations!");            
+        }
+        return;
+    }
+
+    /** Checks if the game has been completed. */
+    method void clearBlanks(){
+        var int i,j;
+        var Square s;
+        var LinkedList queue;
+        var Array visited;  
+
+        let visited = Array.new(model.getRows()*model.getColumns());
+        let i = 0;
+        while(i < (model.getRows() * model.getColumns())){
+           let visited[i] = false;
+           let i = i + 1;
+        }
+        let i = ci;
+        let j = cj;
+        let s = model.getSquare(i,j);
+        let queue = LinkedList.new();
+        do queue.addLast(s.getId());
+        while(queue.getSize()>0){
+            let s = model.getSquareById(queue.removeFirst());
+            if(~(s = null)){                
+                if(~s.isFlag()){
+                    if(~visited[s.getId()]){
+                        let visited[s.getId()] = true;
+                        if(~s.isBomb()){
+                            let i = Model.getColumn(s.getId());
+                            let j = Model.getRow(s.getId());
+                            if(s.isHidden()){
+                                do s.setHidden(false);
+                                let hidden = hidden - 1;
+                            }
+                            do paintSquare(i,j);
+                            if(getMines(i,j)=0){
+                                do queue.addLast(Model.getId(i - 1,j - 1));
+                                do queue.addLast(Model.getId(i - 1,j));
+                                do queue.addLast(Model.getId(i - 1,j + 1));
+                                do queue.addLast(Model.getId(i,j - 1));
+                                do queue.addLast(Model.getId(i,j + 1));
+                                do queue.addLast(Model.getId(i + 1,j - 1));
+                                do queue.addLast(Model.getId(i + 1,j));
+                                do queue.addLast(Model.getId(i + 1,j + 1));                                                    
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        do queue.dispose();
+        do visited.dispose();
+        return;
+    }
+
+    /** Gets the number of bombs surrounding the specified location. */
+    method int getMines(int i, int j){
+        var Square s;
+        var int sum;
+        let sum = 0;
+        let s = model.getSquare(i - 1,j - 1);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i - 1,j);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i - 1,j + 1);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i,j - 1);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i,j + 1);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i + 1,j - 1);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i + 1,j);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        let s = model.getSquare(i + 1,j + 1);
+        if(~(s = null)){
+            if(s.isBomb()){
+                let sum = sum + 1;
+            }
+        }
+        return sum;
+    }
+
+    /** Paints the current selected square. */
+    method void paintSelected(){
+        var Square s;
+        let s = model.getSquare(ci,cj);
+        if(s.isFlag()){
+            do View.drawFlagSelected(View.getSquarePosition(ci, cj));
+        } else {
+            do View.drawSelected(View.getSquarePosition(ci, cj));
+        }
+        return;
+    }
+
+    /** Paints all the squares. */
+    method void paintSquares(){
+        var int i,j;
+        let i = 0; 
+        while(i < model.getColumns()){
+            let j = 0;
+            while(j < model.getRows()){
+               do paintSquare(i,j);
+               let j = j + 1;
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** Paints the square at the specified location. */
+    method void paintSquare(int i, int j){
+        var int mines;
+        var Square s;
+        if(model = null){
+                return;
+        }
+        let s = model.getSquare(i,j);
+        if(s = null){
+            return;
+        }
+        if(s.isHidden()){
+            if(ended){
+                if(s.isFlag()){
+                    if(s.isBomb()){
+                        do View.drawFlag(View.getSquarePosition(i,j));
+                        return;
+                    } else {
+                        do View.drawFail(View.getSquarePosition(i,j));
+                        return;
+                    }
+                } else {
+                    if(s.isBomb()){
+                        do View.drawMine(View.getSquarePosition(i,j));
+                        return;
+                    } else {
+                        do View.drawHidden(View.getSquarePosition(i,j));
+                        return;
+                    }
+                }
+            } else {
+                if(s.isFlag()){
+                    do View.drawFlag(View.getSquarePosition(i,j));
+                    return;
+                } else {
+                    do View.drawHidden(View.getSquarePosition(i,j));
+                    return;
+                }
+            }
+        } else {
+            if(s.isBomb()){
+                do View.drawExplosion(View.getSquarePosition(i,j));
+                return;
+            }
+
+            let mines = getMines(i,j);
+            if(mines = 0){
+                do View.drawBlank(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 1){
+                do View.draw1(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 2){
+                do View.draw2(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 3){
+                do View.draw3(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 4){
+                do View.draw4(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 5){
+                do View.draw5(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 6){
+                do View.draw6(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 7){
+                do View.draw7(View.getSquarePosition(i,j));
+                return;
+            }
+            if(mines = 8){
+                do View.draw8(View.getSquarePosition(i,j));
+                return;
+            }
+        }
+        return;
+    }
    
     /** Disposes this square. */
-   method void dispose() {
-      do Memory.deAlloc(this);
-      return;
-   }
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
 }

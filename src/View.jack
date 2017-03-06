@@ -1,395 +1,464 @@
+/*
+ * Copyright 2017 Ignacio del Valle Alles idelvall@brutusin.org.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Rendering-related functions.
+ * Overall the application (i,j) indexes are used for columns and rows respectively, starting from 0.
+ */
 class View {
- 
-  /**
-   * Returns the location of the square with i and j coordinates (0-based)
-   **/
+
+    /** Shows a message in the top frame of the GUI.*/
+    function void showMessage(String message){
+        var int MAX_LENGTH;
+        let MAX_LENGTH = 35;
+        if(message.length() > MAX_LENGTH){
+            return;
+        }
+        do View.eraseMessage(MAX_LENGTH);
+        do View.moveCursor();
+        do View.printString(message);
+        return;
+    }
+
+    /** Prints and disposes the string (avoids memory leaks with literals) .*/
+    function void printString(String message){
+        do Output.printString(message);
+        do message.dispose();       
+        return;
+    }
+
+    /** Repositions the text printing cursor at the top frame */
+    function void moveCursor(){
+        do Output.moveCursor(2,3);
+        return;
+    }
+
+    /** Clears the message area */
+    function void eraseMessage(int length){
+        var int i;
+        let i = 0;
+        do View.moveCursor();
+        while(i < length){
+            do View.printString("");
+            let i = i + 1;
+        }
+        return;
+    }
    
-   function void showMessage(String message){
-	   do View.printString("                                       ");
-	   do View.printString(message);
-	   return;
-   }
-   
-   function void showLocatedBombsMessage(int located, int total){
-	   do View.showMessage("Located bombs: ");
-	   do Output.printInt(located);
-	   do Output.printString("/");
-	   do Output.printInt(total);
-	   return;
-   }
-   
-   function void printString(String message){
-	   do Output.moveCursor(2,3);
-	   do Output.printString(message);
-	   do message.dispose();	   
-	   return;
-   }
-       
-   function void drawFrame() {
-       // Top frame
-       do Screen.drawLine(14,14,497,14);
-	   do Screen.drawLine(15,15,496,15);
-	   do Screen.drawLine(14,14,14,48);
-	   do Screen.drawLine(15,15,15,46);
-	   do Screen.drawLine(15,47,496,47);
-	   do Screen.drawLine(496,47,496,14);
-	   
-	   // Bottom frame
-	   do Screen.drawLine(14,62,497,62);
-	   do Screen.drawLine(15,63,496,63);
-	   do Screen.drawLine(14,62,14,241);
-	   do Screen.drawLine(15,62,15,240);
-	   do Screen.drawLine(15,240,496,240);
-	   do Screen.drawLine(496,62,496,240);
-		return;
-	}
-	
-	function void drawFail(int location) {
-		var int memAddress; 
-		let memAddress = 16384+location;
-		do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, -32765);
-	do Memory.poke(memAddress+64, 16389);
-	do Memory.poke(memAddress+96, 8457);
-	do Memory.poke(memAddress+128, 4113);
-	do Memory.poke(memAddress+160, 2977);
-	do Memory.poke(memAddress+192, 1857);
-	do Memory.poke(memAddress+224, 3873);
-	do Memory.poke(memAddress+256, 12265);
-	do Memory.poke(memAddress+288, 4065);
-	do Memory.poke(memAddress+320, 1985);
-	do Memory.poke(memAddress+352, 2977);
-	do Memory.poke(memAddress+384, 4113);
-	do Memory.poke(memAddress+416, 8457);
-	do Memory.poke(memAddress+448, 16389);
-	do Memory.poke(memAddress+480, -32765);
-		return;
-	}
-	
-	function void drawHidden(int location) {
+    /** Shows a the flag counter message into the top frame of the GUI.*/
+    function void showLocatedBombsMessage(int located, int total){
+        do View.showMessage("Located bombs: ");
+        do Output.printInt(located);
+        do View.printString("/");
+        do Output.printInt(total);
+        return;
+    }
+
+    /** Returns the sprite location of the square with i and j coordinates (0-based). */
+    function int getSquarePosition(int i, int j) {
+        var int marginX, marginY;
+        let marginX = 1;
+        let marginY = 4 * 16;
+        return ((marginY + (j * 16)) * 32) + marginX + i;
+    }
+    
+    /** Draws the GUI frames. */
+    function void drawFrame() {
+        // Top frame
+        do Screen.drawLine(14,14,497,14);
+        do Screen.drawLine(15,15,496,15);
+        do Screen.drawLine(14,14,14,48);
+        do Screen.drawLine(15,15,15,46);
+        do Screen.drawLine(15,47,496,47);
+        do Screen.drawLine(496,47,496,14);
+        // Bottom frame
+        do Screen.drawLine(14,62,497,62);
+        do Screen.drawLine(15,63,496,63);
+        do Screen.drawLine(14,62,14,241);
+        do Screen.drawLine(15,62,15,240);
+        do Screen.drawLine(15,240,496,240);
+        do Screen.drawLine(496,62,496,240);
+        return;
+    }
+    
+    /** Draws the sprite for a wrong flag. */
+    function void drawFail(int location) {
         var int memAddress; 
-		let memAddress = 16384+location;
-		do Memory.poke(memAddress+0, -27307);
-	do Memory.poke(memAddress+32, -13654);
-	do Memory.poke(memAddress+64, -6819);
-	do Memory.poke(memAddress+96, -5458);
-	do Memory.poke(memAddress+128, -6827);
-	do Memory.poke(memAddress+160, -5462);
-	do Memory.poke(memAddress+192, -6827);
-	do Memory.poke(memAddress+224, -5462);
-	do Memory.poke(memAddress+256, -6827);
-	do Memory.poke(memAddress+288, -5462);
-	do Memory.poke(memAddress+320, -6827);
-	do Memory.poke(memAddress+352, -5462);
-	do Memory.poke(memAddress+384, -8191);
-	do Memory.poke(memAddress+416, -4);
-	do Memory.poke(memAddress+448, -2);
-	do Memory.poke(memAddress+480, -1);
-		return;
-	}
-		function void drawBlank(int location) {
-			var int memAddress; 
-			let memAddress = 16384+location;
-			do Memory.poke(memAddress+0, -1);
-			do Memory.poke(memAddress+32, 1);
-			do Memory.poke(memAddress+64, 1);
-			do Memory.poke(memAddress+96, 1);
-			do Memory.poke(memAddress+128, 1);
-			do Memory.poke(memAddress+160, 1);
-			do Memory.poke(memAddress+192, 1);
-			do Memory.poke(memAddress+224, 1);
-			do Memory.poke(memAddress+256, 1);
-			do Memory.poke(memAddress+288, 1);
-			do Memory.poke(memAddress+320, 1);
-			do Memory.poke(memAddress+352, 1);
-			do Memory.poke(memAddress+384, 1);
-			do Memory.poke(memAddress+416, 1);
-			do Memory.poke(memAddress+448, 1);
-			do Memory.poke(memAddress+480, 1);
-			return;
-		}
-		
-		function void drawMine(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 257);
-	do Memory.poke(memAddress+96, 257);
-	do Memory.poke(memAddress+128, 6097);
-	do Memory.poke(memAddress+160, 4065);
-	do Memory.poke(memAddress+192, 7985);
-	do Memory.poke(memAddress+224, 7985);
-	do Memory.poke(memAddress+256, 32765);
-	do Memory.poke(memAddress+288, 8177);
-	do Memory.poke(memAddress+320, 8177);
-	do Memory.poke(memAddress+352, 4065);
-	do Memory.poke(memAddress+384, 6097);
-	do Memory.poke(memAddress+416, 257);
-	do Memory.poke(memAddress+448, 257);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, -32765);
+        do Memory.poke(memAddress + 64, 16389);
+        do Memory.poke(memAddress + 96, 8457);
+        do Memory.poke(memAddress + 128, 4113);
+        do Memory.poke(memAddress + 160, 2977);
+        do Memory.poke(memAddress + 192, 1857);
+        do Memory.poke(memAddress + 224, 3873);
+        do Memory.poke(memAddress + 256, 12265);
+        do Memory.poke(memAddress + 288, 4065);
+        do Memory.poke(memAddress + 320, 1985);
+        do Memory.poke(memAddress + 352, 2977);
+        do Memory.poke(memAddress + 384, 4113);
+        do Memory.poke(memAddress + 416, 8457);
+        do Memory.poke(memAddress + 448, 16389);
+        do Memory.poke(memAddress + 480, -32765);
+        return;
+    }
+    
+    /** Draws the sprite for a hidden square. */
+    function void drawHidden(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -27307);
+        do Memory.poke(memAddress + 32, -13654);
+        do Memory.poke(memAddress + 64, -6819);
+        do Memory.poke(memAddress + 96, -5458);
+        do Memory.poke(memAddress + 128, -6827);
+        do Memory.poke(memAddress + 160, -5462);
+        do Memory.poke(memAddress + 192, -6827);
+        do Memory.poke(memAddress + 224, -5462);
+        do Memory.poke(memAddress + 256, -6827);
+        do Memory.poke(memAddress + 288, -5462);
+        do Memory.poke(memAddress + 320, -6827);
+        do Memory.poke(memAddress + 352, -5462);
+        do Memory.poke(memAddress + 384, -8191);
+        do Memory.poke(memAddress + 416, -4);
+        do Memory.poke(memAddress + 448, -2);
+        do Memory.poke(memAddress + 480, -1);
+        return;
+    }
 
-function void drawExplosion(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, -28397);
-	do Memory.poke(memAddress+64, 18725);
-	do Memory.poke(memAddress+96, 9545);
-	do Memory.poke(memAddress+128, -26669);
-	do Memory.poke(memAddress+160, 20453);
-	do Memory.poke(memAddress+192, 15481);
-	do Memory.poke(memAddress+224, 7089);
-	do Memory.poke(memAddress+256, -1345);
-	do Memory.poke(memAddress+288, 7089);
-	do Memory.poke(memAddress+320, 15481);
-	do Memory.poke(memAddress+352, 20453);
-	do Memory.poke(memAddress+384, -26669);
-	do Memory.poke(memAddress+416, 9545);
-	do Memory.poke(memAddress+448, 18725);
-	do Memory.poke(memAddress+480, -28397);
-	return;
-}
+    /** Draws the sprite for a blank square. */
+    function void drawBlank(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 1);
+        do Memory.poke(memAddress + 128, 1);
+        do Memory.poke(memAddress + 160, 1);
+        do Memory.poke(memAddress + 192, 1);
+        do Memory.poke(memAddress + 224, 1);
+        do Memory.poke(memAddress + 256, 1);
+        do Memory.poke(memAddress + 288, 1);
+        do Memory.poke(memAddress + 320, 1);
+        do Memory.poke(memAddress + 352, 1);
+        do Memory.poke(memAddress + 384, 1);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
+        
+    /** Draws the sprite for a bomb/mine square. */
+    function void drawMine(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 257);
+        do Memory.poke(memAddress + 96, 257);
+        do Memory.poke(memAddress + 128, 6097);
+        do Memory.poke(memAddress + 160, 4065);
+        do Memory.poke(memAddress + 192, 7985);
+        do Memory.poke(memAddress + 224, 7985);
+        do Memory.poke(memAddress + 256, 32765);
+        do Memory.poke(memAddress + 288, 8177);
+        do Memory.poke(memAddress + 320, 8177);
+        do Memory.poke(memAddress + 352, 4065);
+        do Memory.poke(memAddress + 384, 6097);
+        do Memory.poke(memAddress + 416, 257);
+        do Memory.poke(memAddress + 448, 257);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-   function void draw1(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 769);
-	do Memory.poke(memAddress+128, 897);
-	do Memory.poke(memAddress+160, 961);
-	do Memory.poke(memAddress+192, 993);
-	do Memory.poke(memAddress+224, 897);
-	do Memory.poke(memAddress+256, 897);
-	do Memory.poke(memAddress+288, 897);
-	do Memory.poke(memAddress+320, 897);
-	do Memory.poke(memAddress+352, 897);
-	do Memory.poke(memAddress+384, 4065);
-	do Memory.poke(memAddress+416, 4065);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for the exploting bomb square. */
+    function void drawExplosion(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, -28397);
+        do Memory.poke(memAddress + 64, 18725);
+        do Memory.poke(memAddress + 96, 9545);
+        do Memory.poke(memAddress + 128, -26669);
+        do Memory.poke(memAddress + 160, 20453);
+        do Memory.poke(memAddress + 192, 15481);
+        do Memory.poke(memAddress + 224, 7089);
+        do Memory.poke(memAddress + 256, -1345);
+        do Memory.poke(memAddress + 288, 7089);
+        do Memory.poke(memAddress + 320, 15481);
+        do Memory.poke(memAddress + 352, 20453);
+        do Memory.poke(memAddress + 384, -26669);
+        do Memory.poke(memAddress + 416, 9545);
+        do Memory.poke(memAddress + 448, 18725);
+        do Memory.poke(memAddress + 480, -28397);
+        return;
+    }
+
+    /** Draws the sprite for the selected square. */
+    function void drawSelected(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -32767-1);
+        do Memory.poke(memAddress + 32, -16384);
+        do Memory.poke(memAddress + 64, -8180);
+        do Memory.poke(memAddress + 96, -8180);
+        do Memory.poke(memAddress + 128, -8192);
+        do Memory.poke(memAddress + 160, -8192);
+        do Memory.poke(memAddress + 192, -8192);
+        do Memory.poke(memAddress + 224, -8192);
+        do Memory.poke(memAddress + 256, -8192);
+        do Memory.poke(memAddress + 288, -8192);
+        do Memory.poke(memAddress + 320, -8192);
+        do Memory.poke(memAddress + 352, -8192);
+        do Memory.poke(memAddress + 384, -8192);
+        do Memory.poke(memAddress + 416, -4);
+        do Memory.poke(memAddress + 448, -2);
+        do Memory.poke(memAddress + 480, -1);
+        return;
+    }
+
+    /** Draws the sprite for a flagged square. */
+    function void drawFlag(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -27307);
+        do Memory.poke(memAddress + 32, -14326);
+        do Memory.poke(memAddress + 64, -6715);
+        do Memory.poke(memAddress + 96, -5662);
+        do Memory.poke(memAddress + 128, -6859);
+        do Memory.poke(memAddress + 160, -5662);
+        do Memory.poke(memAddress + 192, -6715);
+        do Memory.poke(memAddress + 224, -5878);
+        do Memory.poke(memAddress + 256, -7915);
+        do Memory.poke(memAddress + 288, -7230);
+        do Memory.poke(memAddress + 320, -4107);
+        do Memory.poke(memAddress + 352, -4110);
+        do Memory.poke(memAddress + 384, -8191);
+        do Memory.poke(memAddress + 416, -4);
+        do Memory.poke(memAddress + 448, -2);
+        do Memory.poke(memAddress + 480, -1);
+        return;
+    }
+
+    /** Draws the sprite for a flagged and selected square. */
+    function void drawFlagSelected(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -32767-1);
+        do Memory.poke(memAddress + 32, -16384);
+        do Memory.poke(memAddress + 64, -7808);
+        do Memory.poke(memAddress + 96, -7712);
+        do Memory.poke(memAddress + 128, -7888);
+        do Memory.poke(memAddress + 160, -7712);
+        do Memory.poke(memAddress + 192, -7808);
+        do Memory.poke(memAddress + 224, -7936);
+        do Memory.poke(memAddress + 256, -7936);
+        do Memory.poke(memAddress + 288, -7232);
+        do Memory.poke(memAddress + 320, -4112);
+        do Memory.poke(memAddress + 352, -4112);
+        do Memory.poke(memAddress + 384, -8192);
+        do Memory.poke(memAddress + 416, -4);
+        do Memory.poke(memAddress + 448, -2);
+        do Memory.poke(memAddress + 480, -1);
+        return;
+    }
+
+    /** Draws the sprite for square with a 1. */
+    function void draw1(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 769);
+        do Memory.poke(memAddress + 128, 897);
+        do Memory.poke(memAddress + 160, 961);
+        do Memory.poke(memAddress + 192, 993);
+        do Memory.poke(memAddress + 224, 897);
+        do Memory.poke(memAddress + 256, 897);
+        do Memory.poke(memAddress + 288, 897);
+        do Memory.poke(memAddress + 320, 897);
+        do Memory.poke(memAddress + 352, 897);
+        do Memory.poke(memAddress + 384, 4065);
+        do Memory.poke(memAddress + 416, 4065);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
    
-   function void draw2(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 4081);
-	do Memory.poke(memAddress+128, 8185);
-	do Memory.poke(memAddress+160, 7225);
-	do Memory.poke(memAddress+192, 7169);
-	do Memory.poke(memAddress+224, 3841);
-	do Memory.poke(memAddress+256, 1985);
-	do Memory.poke(memAddress+288, 497);
-	do Memory.poke(memAddress+320, 121);
-	do Memory.poke(memAddress+352, 8185);
-	do Memory.poke(memAddress+384, 8185);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for square with a 2. */
+    function void draw2(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 4081);
+        do Memory.poke(memAddress + 128, 8185);
+        do Memory.poke(memAddress + 160, 7225);
+        do Memory.poke(memAddress + 192, 7169);
+        do Memory.poke(memAddress + 224, 3841);
+        do Memory.poke(memAddress + 256, 1985);
+        do Memory.poke(memAddress + 288, 497);
+        do Memory.poke(memAddress + 320, 121);
+        do Memory.poke(memAddress + 352, 8185);
+        do Memory.poke(memAddress + 384, 8185);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-function void draw3(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 4089);
-	do Memory.poke(memAddress+128, 8185);
-	do Memory.poke(memAddress+160, 7169);
-	do Memory.poke(memAddress+192, 7169);
-	do Memory.poke(memAddress+224, 4033);
-	do Memory.poke(memAddress+256, 4033);
-	do Memory.poke(memAddress+288, 7169);
-	do Memory.poke(memAddress+320, 7169);
-	do Memory.poke(memAddress+352, 8185);
-	do Memory.poke(memAddress+384, 4089);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for square with a 3. */
+    function void draw3(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 4089);
+        do Memory.poke(memAddress + 128, 8185);
+        do Memory.poke(memAddress + 160, 7169);
+        do Memory.poke(memAddress + 192, 7169);
+        do Memory.poke(memAddress + 224, 4033);
+        do Memory.poke(memAddress + 256, 4033);
+        do Memory.poke(memAddress + 288, 7169);
+        do Memory.poke(memAddress + 320, 7169);
+        do Memory.poke(memAddress + 352, 8185);
+        do Memory.poke(memAddress + 384, 4089);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-function void draw4(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 3809);
-	do Memory.poke(memAddress+128, 3809);
-	do Memory.poke(memAddress+160, 3697);
-	do Memory.poke(memAddress+192, 3697);
-	do Memory.poke(memAddress+224, 8185);
-	do Memory.poke(memAddress+256, 8185);
-	do Memory.poke(memAddress+288, 3585);
-	do Memory.poke(memAddress+320, 3585);
-	do Memory.poke(memAddress+352, 3585);
-	do Memory.poke(memAddress+384, 3585);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for square with a 4. */
+    function void draw4(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 3809);
+        do Memory.poke(memAddress + 128, 3809);
+        do Memory.poke(memAddress + 160, 3697);
+        do Memory.poke(memAddress + 192, 3697);
+        do Memory.poke(memAddress + 224, 8185);
+        do Memory.poke(memAddress + 256, 8185);
+        do Memory.poke(memAddress + 288, 3585);
+        do Memory.poke(memAddress + 320, 3585);
+        do Memory.poke(memAddress + 352, 3585);
+        do Memory.poke(memAddress + 384, 3585);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-function void draw5(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 8185);
-	do Memory.poke(memAddress+128, 8185);
-	do Memory.poke(memAddress+160, 57);
-	do Memory.poke(memAddress+192, 57);
-	do Memory.poke(memAddress+224, 4089);
-	do Memory.poke(memAddress+256, 8185);
-	do Memory.poke(memAddress+288, 7169);
-	do Memory.poke(memAddress+320, 7169);
-	do Memory.poke(memAddress+352, 8185);
-	do Memory.poke(memAddress+384, 4089);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for square with a 5. */
+    function void draw5(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 8185);
+        do Memory.poke(memAddress + 128, 8185);
+        do Memory.poke(memAddress + 160, 57);
+        do Memory.poke(memAddress + 192, 57);
+        do Memory.poke(memAddress + 224, 4089);
+        do Memory.poke(memAddress + 256, 8185);
+        do Memory.poke(memAddress + 288, 7169);
+        do Memory.poke(memAddress + 320, 7169);
+        do Memory.poke(memAddress + 352, 8185);
+        do Memory.poke(memAddress + 384, 4089);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-function void draw6(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 4081);
-	do Memory.poke(memAddress+128, 4089);
-	do Memory.poke(memAddress+160, 57);
-	do Memory.poke(memAddress+192, 57);
-	do Memory.poke(memAddress+224, 4089);
-	do Memory.poke(memAddress+256, 8185);
-	do Memory.poke(memAddress+288, 7225);
-	do Memory.poke(memAddress+320, 7225);
-	do Memory.poke(memAddress+352, 8185);
-	do Memory.poke(memAddress+384, 4081);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for square with a 6. */
+    function void draw6(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 4081);
+        do Memory.poke(memAddress + 128, 4089);
+        do Memory.poke(memAddress + 160, 57);
+        do Memory.poke(memAddress + 192, 57);
+        do Memory.poke(memAddress + 224, 4089);
+        do Memory.poke(memAddress + 256, 8185);
+        do Memory.poke(memAddress + 288, 7225);
+        do Memory.poke(memAddress + 320, 7225);
+        do Memory.poke(memAddress + 352, 8185);
+        do Memory.poke(memAddress + 384, 4081);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-function void draw7(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 8185);
-	do Memory.poke(memAddress+128, 8185);
-	do Memory.poke(memAddress+160, 7169);
-	do Memory.poke(memAddress+192, 7169);
-	do Memory.poke(memAddress+224, 3585);
-	do Memory.poke(memAddress+256, 3585);
-	do Memory.poke(memAddress+288, 1793);
-	do Memory.poke(memAddress+320, 1793);
-	do Memory.poke(memAddress+352, 897);
-	do Memory.poke(memAddress+384, 897);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
+    /** Draws the sprite for square with a 7. */
+    function void draw7(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 8185);
+        do Memory.poke(memAddress + 128, 8185);
+        do Memory.poke(memAddress + 160, 7169);
+        do Memory.poke(memAddress + 192, 7169);
+        do Memory.poke(memAddress + 224, 3585);
+        do Memory.poke(memAddress + 256, 3585);
+        do Memory.poke(memAddress + 288, 1793);
+        do Memory.poke(memAddress + 320, 1793);
+        do Memory.poke(memAddress + 352, 897);
+        do Memory.poke(memAddress + 384, 897);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 
-function void draw8(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -1);
-	do Memory.poke(memAddress+32, 1);
-	do Memory.poke(memAddress+64, 1);
-	do Memory.poke(memAddress+96, 4081);
-	do Memory.poke(memAddress+128, 8185);
-	do Memory.poke(memAddress+160, 7225);
-	do Memory.poke(memAddress+192, 7225);
-	do Memory.poke(memAddress+224, 4081);
-	do Memory.poke(memAddress+256, 4081);
-	do Memory.poke(memAddress+288, 7225);
-	do Memory.poke(memAddress+320, 7225);
-	do Memory.poke(memAddress+352, 8185);
-	do Memory.poke(memAddress+384, 4081);
-	do Memory.poke(memAddress+416, 1);
-	do Memory.poke(memAddress+448, 1);
-	do Memory.poke(memAddress+480, 1);
-	return;
-}
-function void drawSelected(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -32767-1);
-	do Memory.poke(memAddress+32, -16384);
-	do Memory.poke(memAddress+64, -8180);
-	do Memory.poke(memAddress+96, -8180);
-	do Memory.poke(memAddress+128, -8192);
-	do Memory.poke(memAddress+160, -8192);
-	do Memory.poke(memAddress+192, -8192);
-	do Memory.poke(memAddress+224, -8192);
-	do Memory.poke(memAddress+256, -8192);
-	do Memory.poke(memAddress+288, -8192);
-	do Memory.poke(memAddress+320, -8192);
-	do Memory.poke(memAddress+352, -8192);
-	do Memory.poke(memAddress+384, -8192);
-	do Memory.poke(memAddress+416, -4);
-	do Memory.poke(memAddress+448, -2);
-	do Memory.poke(memAddress+480, -1);
-	return;
-}
-function void drawFlag(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -27307);
-	do Memory.poke(memAddress+32, -14326);
-	do Memory.poke(memAddress+64, -6715);
-	do Memory.poke(memAddress+96, -5662);
-	do Memory.poke(memAddress+128, -6859);
-	do Memory.poke(memAddress+160, -5662);
-	do Memory.poke(memAddress+192, -6715);
-	do Memory.poke(memAddress+224, -5878);
-	do Memory.poke(memAddress+256, -7915);
-	do Memory.poke(memAddress+288, -7230);
-	do Memory.poke(memAddress+320, -4107);
-	do Memory.poke(memAddress+352, -4110);
-	do Memory.poke(memAddress+384, -8191);
-	do Memory.poke(memAddress+416, -4);
-	do Memory.poke(memAddress+448, -2);
-	do Memory.poke(memAddress+480, -1);
-	return;
-}
-
-function void drawFlagSelected(int location) {
-	var int memAddress; 
-	let memAddress = 16384+location;
-	do Memory.poke(memAddress+0, -32767-1);
-	do Memory.poke(memAddress+32, -16384);
-	do Memory.poke(memAddress+64, -7808);
-	do Memory.poke(memAddress+96, -7712);
-	do Memory.poke(memAddress+128, -7888);
-	do Memory.poke(memAddress+160, -7712);
-	do Memory.poke(memAddress+192, -7808);
-	do Memory.poke(memAddress+224, -7936);
-	do Memory.poke(memAddress+256, -7936);
-	do Memory.poke(memAddress+288, -7232);
-	do Memory.poke(memAddress+320, -4112);
-	do Memory.poke(memAddress+352, -4112);
-	do Memory.poke(memAddress+384, -8192);
-	do Memory.poke(memAddress+416, -4);
-	do Memory.poke(memAddress+448, -2);
-	do Memory.poke(memAddress+480, -1);
-	return;
-}
+    /** Draws the sprite for square with a 8. */
+    function void draw8(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress + 0, -1);
+        do Memory.poke(memAddress + 32, 1);
+        do Memory.poke(memAddress + 64, 1);
+        do Memory.poke(memAddress + 96, 4081);
+        do Memory.poke(memAddress + 128, 8185);
+        do Memory.poke(memAddress + 160, 7225);
+        do Memory.poke(memAddress + 192, 7225);
+        do Memory.poke(memAddress + 224, 4081);
+        do Memory.poke(memAddress + 256, 4081);
+        do Memory.poke(memAddress + 288, 7225);
+        do Memory.poke(memAddress + 320, 7225);
+        do Memory.poke(memAddress + 352, 8185);
+        do Memory.poke(memAddress + 384, 4081);
+        do Memory.poke(memAddress + 416, 1);
+        do Memory.poke(memAddress + 448, 1);
+        do Memory.poke(memAddress + 480, 1);
+        return;
+    }
 }
