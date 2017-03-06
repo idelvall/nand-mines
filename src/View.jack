@@ -20,23 +20,26 @@
  */
 class View {
 
+    static int MAX_LENGTH;
+    static String FLAGS_MESSAGE, EMPTY, SLASH;
+
+    /** Constants initialization */
+    function void init(){
+        let MAX_LENGTH = 35;
+        let FLAGS_MESSAGE = "Located bombs: ";
+        let SLASH = "/";
+        let EMPTY = "";
+        return;
+    }
+
     /** Shows a message in the top frame of the GUI.*/
     function void showMessage(String message){
-        var int MAX_LENGTH;
-        let MAX_LENGTH = 35;
         if(message.length() > MAX_LENGTH){
             return;
         }
         do View.eraseMessage(MAX_LENGTH);
         do View.moveCursor();
-        do View.printString(message);
-        return;
-    }
-
-    /** Prints and disposes the string (avoids memory leaks with literals) .*/
-    function void printString(String message){
         do Output.printString(message);
-        do message.dispose();       
         return;
     }
 
@@ -52,7 +55,7 @@ class View {
         let i = 0;
         do View.moveCursor();
         while(i < length){
-            do View.printString("");
+            do Output.printString(EMPTY);
             let i = i + 1;
         }
         return;
@@ -60,9 +63,9 @@ class View {
    
     /** Shows a the flag counter message into the top frame of the GUI.*/
     function void showLocatedBombsMessage(int located, int total){
-        do View.showMessage("Located bombs: ");
+        do View.showMessage(FLAGS_MESSAGE);
         do Output.printInt(located);
-        do View.printString("/");
+        do Output.printString(SLASH);
         do Output.printInt(total);
         return;
     }

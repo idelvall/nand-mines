@@ -19,11 +19,26 @@
  * Overall the application (i,j) indexes are used for columns and rows respectively, starting from 0.
  */
 class NandMines {
-  
+
+    static int BOMBS_NUMBER;
+    static String HELP_MESSAGE, BOOM_MESSAGE, CONGRATS_MESSAGE;
+
     field Model model;	     // game data 
     field boolean ended;     // game over
     field int ci, cj;        // current position (selected square)
     field int flags, hidden; // counters
+
+    /** Static initializations */
+    function void init(){
+        let BOMBS_NUMBER = 50;
+        let HELP_MESSAGE = "Press F1 for help";
+        let BOOM_MESSAGE = "BOOOM!  (press 'r' to restart)";
+        let CONGRATS_MESSAGE = "Congratulations!";
+
+        do Model.init();
+        do View.init();
+        return;
+    }
 
     constructor NandMines new(){
         do restart();
@@ -37,6 +52,7 @@ class NandMines {
         var NandMines nandMines;
         var int counter; // used as randomization seed
 
+        do NandMines.init();
         let exit = false;
         let randomize = true;
         let nandMines = NandMines.new();
@@ -81,9 +97,9 @@ class NandMines {
         let ci = 0;
         let cj = 0;
         let flags = 0;
-        let hidden = model.getRows() * model.getColumns();
+        let hidden = Model.getRows() * Model.getColumns();
         do View.drawFrame();
-        do View.showMessage("Press F1 for help");
+        do View.showMessage(HELP_MESSAGE);
         do paintSquares();
         do paintSelected();
         return;
@@ -91,7 +107,7 @@ class NandMines {
 
     /** Randomly places the bombs over the model. */
     method void randomizeBombs(int randomSeed){
-        do model.setBombs(50, randomSeed);
+        do model.setBombs(BOMBS_NUMBER, randomSeed);
         return;
     }
 
@@ -113,7 +129,7 @@ class NandMines {
         } else {
             let k = i - 1;
         }
-        while((k < model.getColumns()) & (k >  - 1)){
+        while((k < Model.getColumns()) & (k >  - 1)){
             let s = model.getSquare(k,j);
             if(s.isHidden()){
                 do paintSquare(ci,cj);
@@ -130,7 +146,7 @@ class NandMines {
         }
 
         if(right){
-            if(j = (model.getRows() - 1)){
+            if(j = (Model.getRows() - 1)){
                 let j = 0;
             } else {
                 let j = j + 1;
@@ -138,11 +154,11 @@ class NandMines {
             do moveHorizontalStartingIn( - 1, j, right);
         } else {
             if(j = 0){
-                let j = model.getRows() - 1;
+                let j = Model.getRows() - 1;
             } else {
                 let j = j - 1;
             }
-            do moveHorizontalStartingIn(model.getColumns(), j, right);
+            do moveHorizontalStartingIn(Model.getColumns(), j, right);
         }
         return;
     }
@@ -165,7 +181,7 @@ class NandMines {
         }else{
             let k = j - 1;
         }
-        while((k<model.getRows()) & (k> - 1)){
+        while((k<Model.getRows()) & (k> - 1)){
             let s = model.getSquare(i,k);
             if(s.isHidden()){
                 do paintSquare(ci,cj);
@@ -181,7 +197,7 @@ class NandMines {
             }
         }
         if(down){
-            if(i = (model.getColumns() - 1)){
+            if(i = (Model.getColumns() - 1)){
                 let i = 0;
             } else {
                 let i = i + 1;
@@ -189,11 +205,11 @@ class NandMines {
             do moveVerticalStartingIn(i,  - 1, down);
         } else {
             if(i = 0){
-                let i = model.getColumns() - 1;
+                let i = Model.getColumns() - 1;
             } else {
                 let i = i - 1;
             }
-            do moveVerticalStartingIn(i, model.getRows(), down);
+            do moveVerticalStartingIn(i, Model.getRows(), down);
         }
         return;
     }
@@ -235,7 +251,7 @@ class NandMines {
         }
         if(s.isBomb()){
             let ended=true;
-            do View.showMessage("BOOOM!  (press 'r' to restart)");
+            do View.showMessage(BOOM_MESSAGE);
             do paintSquares();
         } else {
             do paintSquare(ci,cj);
@@ -249,21 +265,25 @@ class NandMines {
     method void checkComplete(){
         if((hidden = flags) & (hidden = model.getBombs())){
             let ended=true;
-            do View.showMessage("Congratulations!");            
+            do View.showMessage(CONGRATS_MESSAGE);            
         }
         return;
     }
 
-    /** Checks if the game has been completed. */
+    /** Iteratively clears the adjacent squares with no bombs close to them. */
     method void clearBlanks(){
         var int i,j;
         var Square s;
-        var LinkedList queue;
+
+        // Uses as a queue for an iterative BFS traversal of the nodes. 
+        // BFS gives a prettier effect than DFS for cascading discovering. 
+        // Iterative approach is required to avoid deep recursion stacks that may overflow
+        var LinkedList queue; 
         var Array visited;  
 
-        let visited = Array.new(model.getRows()*model.getColumns());
+        let visited = Array.new(Model.getRows()*Model.getColumns());
         let i = 0;
-        while(i < (model.getRows() * model.getColumns())){
+        while(i < (Model.getRows() * Model.getColumns())){
            let visited[i] = false;
            let i = i + 1;
         }
@@ -378,9 +398,9 @@ class NandMines {
     method void paintSquares(){
         var int i,j;
         let i = 0; 
-        while(i < model.getColumns()){
+        while(i < Model.getColumns()){
             let j = 0;
-            while(j < model.getRows()){
+            while(j < Model.getRows()){
                do paintSquare(i,j);
                let j = j + 1;
             }

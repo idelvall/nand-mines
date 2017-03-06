@@ -1,124 +1,156 @@
+/*
+ * Copyright 2017 Ignacio del Valle Alles idelvall@brutusin.org.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * NandMines data model. Basically consisting in an array of Square instances and some accession helper methods
+ * Overall the application (i,j) indexes are used for columns and rows respectively, starting from 0.
+ */
 class Model {
   
-	static int BOMBS, SIZE, COLUMNS, ROWS;
-	field Array grid;
-	field int _bombs;
-	
-	constructor Model new(){
-		var int i;
-			
-		let BOMBS = 20;
-	    let COLUMNS = 30;
-	    let ROWS = 11;
-		let SIZE = COLUMNS*ROWS;
-	    let grid = Array.new(SIZE);
-		
-		let i = 0;
-		
-	    while(i<SIZE){
-           let grid[i]=Square.new(i);
-     		let i=i+1;
-	    }
-		
-		return this;
-	}
-	
-	method void setBombs(int bombs, int randomSeed){
-		var int i, r;
-		var Random rand;
-		var Square s;
-		
-		let _bombs = bombs;
-		let i = 0;
-		let rand = Random.new(randomSeed, SIZE-1);
-		while(i<bombs){
-			let r = rand.next();
-			let s = grid[r];
-			if(~s.isBomb()){
-				do s.setBomb(true);
-				let i=i+1;
-			} else {
-				do rand.dispose();
-				let rand = Random.new(r+757, SIZE-1);
-			}
-	    }
-		do rand.dispose();
-		return;
-	}
-		
-	method int getBombs(){
-		return _bombs;
-	}
-	
-	method Square getSquareById(int id){
-		if(id<0){
-			return null;
-		}
-		if(id>SIZE){
-			return null;
-		}
-		return grid[id];
-	}
-		
+    static int SIZE, COLUMNS, ROWS;
+
+    field Array grid;
+    field int _bombs;
+
+    /** Constants initialization */
+    function void init(){
+        let COLUMNS = 30;
+        let ROWS = 11;
+        let SIZE = COLUMNS*ROWS;
+        return;
+    }
+    
+    constructor Model new(){
+        var int i;
+                
+        let grid = Array.new(SIZE);
+        let i = 0;
+        while(i < SIZE){
+            let grid[i] = Square.new(i);
+            let i=i+1;
+        }
+        return this;
+    }
+
+    /** Return the number of columns of any model instance. */
+    function int getColumns(){
+        return COLUMNS;
+    }
+
+    /** Return the number of rows of any model instance. */    
+    function int getRows(){
+        return ROWS;
+    }
+
+    /** Gets the id of the (i,j) square. */
+    function int getId(int i, int j){
+        if(i < 0){
+            return -1;
+        }
+        if(j< 0){
+            return -1;
+        }
+        if(i > (COLUMNS - 1)){
+            return -1;
+        }
+        if(j > (ROWS - 1)){
+            return -1;
+        }
+        return (j * COLUMNS) + i;
+    }
+    
+    /** Returns the column index of the square with given id. */
+    function int getColumn(int id){
+        return id-(COLUMNS * Model.getRow(id));
+    }
+
+    /** Returns the row index of the square with given id. */    
+    function int getRow(int id){
+        return id/COLUMNS;
+    }
+
+    /** Randomly set 'bombs' squares as having bombs. */    
+    method void setBombs(int bombs, int randomSeed){
+        var int i, r;
+        var Random rand;
+        var Square s;
+        
+        let _bombs = bombs;
+        let i = 0;
+        let rand = Random.new(randomSeed, SIZE - 1);
+        while(i < bombs){
+            let r = rand.next();
+            let s = grid[r];
+            if(~s.isBomb()){
+                do s.setBomb(true);
+                let i = i + 1;
+            } else {
+                do rand.dispose();
+                let rand = Random.new(r + 757, SIZE - 1);
+            }
+        }
+        do rand.dispose();
+        return;
+    }
+        
+    /** Returns the number of bombs in the model. */
+    method int getBombs(){
+        return _bombs;
+    }
+
+    /** Gets the square by id. */
+    method Square getSquareById(int id){
+        if(id < 0){
+            return null;
+        }
+        if(id > SIZE){
+            return null;
+        }
+        return grid[id];
+    }
+        
+    /** Gets the square by coordinates. */
     method Square getSquare(int i, int j){
-	    if(i<0){
-			return null;
-		}
-		if(j<0){
-			return null;
-		}
-		if(i>(COLUMNS-1)){
-			return null;
-		}
-		if(j>(ROWS-1)){
-			return null;
-		}
-		return grid[Model.getId(i,j)];
-	}
-	
-	function int getId(int i, int j){
-		if(i<0){
-			return -1;
-		}
-		if(j<0){
-			return -1;
-		}
-		if(i>(COLUMNS-1)){
-			return -1;
-		}
-		if(j>(ROWS-1)){
-			return -1;
-		}
-		return (j*COLUMNS) + i;
-	}
-	
-	function int getColumn(int id){
-		return id-(COLUMNS*Model.getRow(id));
-	}
-	
-	function int getRow(int id){
-		return id/COLUMNS;
-	}
-	
-	method void dispose () {
-	    var int i;
-		var Square s;
-	    let i = 0;
-	    while(i<SIZE){
-		    let s=grid[i];
-			do s.dispose();
-			let i=i+1;
-	    }
-		do grid.dispose();
-		do Memory.deAlloc(this);
-		return;
-	}
-	
-	method int getColumns(){
-		return COLUMNS;
-	}
-	
-	method int getRows(){
-		return ROWS;
-	}
+        if(i < 0){
+            return null;
+        }
+        if(j < 0){
+            return null;
+        }
+        if(i > (COLUMNS - 1)){
+            return null;
+        }
+        if(j > (ROWS - 1)){
+            return null;
+        }
+        return grid[Model.getId(i,j)];
+    }
+    
+    /** Guess what it does?*/    
+    method void dispose () {
+        var int i;
+        var Square s;
+        let i = 0;
+        while(i < SIZE){
+            let s = grid[i];
+            do s.dispose();
+            let i = i + 1;
+        }
+        do grid.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }       
 }
