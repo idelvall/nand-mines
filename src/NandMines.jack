@@ -27,7 +27,6 @@ class NandMines {
     field boolean ended;     // game over
     field int ci, cj;        // current position (selected square)
     field int flags, hidden; // counters
-    field boolean help;      // help is showing
 
     /** Static initializations */
     function void init(){
@@ -49,16 +48,16 @@ class NandMines {
 
     /** Execution entry point. */
     function void run() {
-        var char key;  // the key currently pressed by the user
-        var boolean exit, randomize;
-        var NandMines nandMines;
-        var int counter; // used as randomization seed
+        var char key;                         // the key currently pressed by the user
+        var boolean exit, randomize, help;    // control flags 
+        var NandMines nandMines;              // application controller
+        var int counter;                      // used as randomization seed
 
         do NandMines.init();
         let exit = false;
         let randomize = true;
         let nandMines = NandMines.new();
-
+        let help = false;
         while (~exit) {
             // waits for a key to be pressed and released
             while (key = 0) {
@@ -66,25 +65,33 @@ class NandMines {
                 let key = Keyboard.keyPressed();
             }
             while (~(Keyboard.keyPressed() = 0)) {}
-            if(randomize){
-                do nandMines.randomizeBombs(counter);
-                let randomize = false;
+            if(help){
+                if (key = 140) {  // ESC
+                    do nandMines.paintGameBoard(); 
+                    let help = false;
+                }      
+            } else {
+                if(randomize){
+                    do nandMines.randomizeBombs(counter);
+                    let randomize = false;
+                }
+                if ((key = 81)|(key = 113))  { let exit = true; }      // q key
+                if ((key = 82)|(key = 114))  {                         // r key
+                    do nandMines.restart();    
+                    let randomize = true;
+                }       
+                if ((key = 72)|(key = 104)) {                          // h key
+                    do nandMines.showHelpDialog();
+                    let help = true;    
+                }   
+
+                if (key = 130) { do nandMines.moveHorizontal(false); } // left arrow
+                if (key = 131) { do nandMines.moveVertical(false);}    // up arrow
+                if (key = 132) { do nandMines.moveHorizontal(true); }  // right arrow
+                if (key = 133) { do nandMines.moveVertical(true); }    // down arrow
+                if (key = 139) { do nandMines.clearSquare(); }         // supr key
+                if (key = 138) { do nandMines.toggleFlag(); }          // insert key
             }
-            if ((key = 81)|(key = 113))  { let exit = true; }      // q key
-            if ((key = 82)|(key = 114))  {                         // r key
-                do nandMines.restart();    
-                let randomize = true;
-            }       
-            if ((key = 72)|(key = 104)) {                          // h key
-                do nandMines.showHelpDialog(); 
-            }   
-            if (key = 140) { do nandMines.paintGameBoard(); }      // ESC
-            if (key = 130) { do nandMines.moveHorizontal(false); } // left arrow
-            if (key = 131) { do nandMines.moveVertical(false);}    // up arrow
-            if (key = 132) { do nandMines.moveHorizontal(true); }  // right arrow
-            if (key = 133) { do nandMines.moveVertical(true); }    // down arrow
-            if (key = 139) { do nandMines.clearSquare(); }         // supr key
-            if (key = 138) { do nandMines.toggleFlag(); }          // insert key
             let key = 0;
         } 
 
@@ -95,9 +102,6 @@ class NandMines {
 
     /** Starts a new game. */
     method void restart(){
-        if(help){
-            return;
-        }
         if(~(model = null)){
             do model.dispose();
         }
@@ -120,7 +124,6 @@ class NandMines {
 
     /** Shows the help dialog. */
     method void showHelpDialog(){
-        let help = true;
         do View.showHelp();
         do View.showMessage(HELP_BACK_MESSAGE);
         return;
@@ -128,7 +131,6 @@ class NandMines {
 
     /** Paints the squares board. */
     method void paintGameBoard(){
-        let help = false;
         do paintSquares();
         do paintSelected();
         do View.showMessage(HELP_MESSAGE);
@@ -137,9 +139,6 @@ class NandMines {
 
     /** Left/right movements of the currently selected square. */
     method void moveHorizontal(boolean right){
-        if(help){
-            return;
-        }
         do moveHorizontalStartingIn(ci, cj, right);
         return;
     }
@@ -192,9 +191,6 @@ class NandMines {
 
     /** Up/down movements of the currently selected square. */
     method void moveVertical(boolean down){
-        if(help){
-            return;
-        }
         do moveVerticalStartingIn(ci,cj,down);
         return;
     }
@@ -247,9 +243,6 @@ class NandMines {
     /** Put/remove a flag in the current active position. */
     method void toggleFlag(){
         var Square s;
-        if(help){
-            return;
-        }
         if(ended){
             return;
         }
@@ -270,9 +263,6 @@ class NandMines {
     method void clearSquare(){
         var int i;        
         var Square s;
-        if(help){
-            return;
-        }
         if(ended){
             return;
         }
@@ -421,6 +411,9 @@ class NandMines {
     /** Paints the current selected square. */
     method void paintSelected(){
         var Square s;
+        if(ended){
+            return;
+        }
         let s = model.getSquare(ci,cj);
         if(s.isFlag()){
             do View.drawFlagSelected(View.getSquarePosition(ci, cj));
