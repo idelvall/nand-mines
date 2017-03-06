@@ -22,13 +22,16 @@ class View {
 
     static int MAX_LENGTH;
     static String FLAGS_MESSAGE, EMPTY, SLASH;
+    static Image TITLE_IMAGE, HELP_IMAGE;
 
     /** Constants initialization */
     function void init(){
-        let MAX_LENGTH = 35;
+        let MAX_LENGTH = 30;
         let FLAGS_MESSAGE = "Located bombs: ";
         let SLASH = "/";
-        let EMPTY = "";
+        let EMPTY = " ";
+        let TITLE_IMAGE = TitleImage.newImage();
+        let HELP_IMAGE = HelpImage.newImage();
         return;
     }
 
@@ -94,6 +97,14 @@ class View {
         do Screen.drawLine(15,62,15,240);
         do Screen.drawLine(15,240,496,240);
         do Screen.drawLine(496,62,496,240);
+        //
+        do TITLE_IMAGE.draw(18,2);
+        return;
+    }
+
+    /** Shows the help dialog.*/
+    function void showHelp(){
+        do HELP_IMAGE.draw(0,60);
         return;
     }
     
