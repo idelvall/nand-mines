@@ -1,7 +1,8 @@
 # NAND Mines
-Minesweeper for the hack machine implemented in jack language. Nand2Tetris is an online,
+Minesweeper for the Hack machine implemented in jack language. **Nand2Tetris** is an online,
 self-teachable course on Building a Modern Computer from First Principles: 
-http://www.nand2tetris.org/
+http://www.nand2tetris.org/.
+This was my project submission for the module 9.
 
 Table of Contents
 =================
@@ -17,7 +18,8 @@ These programs are already compiled with the JackCompiler into vm code, they
 just need to be loaded into the VMEmulator and executed as follows:
 
  - Download and install the Nand2tetris Software Suite (http://www.nand2tetris.org/software.php)
- - Start the VMEmulator.
+ - Compile the src folder with the `JackCompiler` tool.
+ - Start the `VMEmulator`.
  - Using File -> Load Program, select the application's directory and click the "Load Program" button.
  - Click the "Yes" button to the Confirmation Message pop-up.
  - Set the Animate: drop-down to "No animation".
