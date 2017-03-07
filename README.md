@@ -14,8 +14,6 @@ Table of Contents
 * [License](#license)
 
 ## General execution instructions
-These programs are already compiled with the JackCompiler into vm code, they
-just need to be loaded into the VMEmulator and executed as follows:
 
  - Download and install the Nand2tetris Software Suite (http://www.nand2tetris.org/software.php)
  - Compile the src folder with the `JackCompiler` tool.
