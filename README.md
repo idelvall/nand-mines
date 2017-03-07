@@ -32,7 +32,9 @@ Table of Contents
 ###Help
 ![nand-mines help](img/nand-mines-help.gif)
 ##Acknowledgements
-This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation.
+- Thanks to all the [nand2tetris crew](http://www.nand2tetris.org/team.php) for the best learning experience of my life.
+- This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation. Thanks @gav- for your amazing work
+- Thanks Golan Parashi for the Sokoban bitmap editor
 ## Support bugs and requests
 https://github.com/idelvall/nand-mines/issues
 
