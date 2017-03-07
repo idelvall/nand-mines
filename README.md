@@ -1,8 +1,12 @@
 # NAND Mines
 Minesweeper for the Hack machine implemented in jack language. **Nand2Tetris** is an online,
-self-teachable course on Building a Modern Computer from First Principles: 
-http://www.nand2tetris.org/.
-This was my project submission for the module 9.
+self-teachable course on Building a Modern Computer from First Principles http://www.nand2tetris.org/.
+
+This was my project submission for the module 9, a game implemented in the Jack language, a minimalist high level, OO language we have implemented for the Hack machine, a 16-bit hardware wachine we had previously built starting from very ground: logical NAND gates.
+
+Jack language is compiled in a two-step way into Hack assembly, passing through a stack machine language called VM code.
+
+All these is created by the students, and this is the culmination of the work.
 
 Table of Contents
 =================
