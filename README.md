@@ -34,7 +34,7 @@ Table of Contents
 ##Acknowledgements
 - Thanks to all the [nand2tetris crew](http://www.nand2tetris.org/team.php) for the best learning experience of my life.
 - This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation. Thanks Gavin Stewart for your amazing work
-- Thanks to Golan Parashi for the Sokoban bitmap editor
+- Thanks to Golan Parashi for the [Sokoban bitmap editor](https://github.com/idelvall/nand-mines/tree/master/tools/BitmapEditor)
 
 ## Support bugs and requests
 https://github.com/idelvall/nand-mines/issues
