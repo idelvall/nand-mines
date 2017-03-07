@@ -32,7 +32,7 @@ class NandMines {
     function void init(){
         let BOMBS_NUMBER = 50;
         let HELP_MESSAGE = "Press 'h' for help";
-        let HELP_BACK_MESSAGE = "Press 'ESC' to go back to game";
+        let HELP_BACK_MESSAGE = "Press 'ESC' to return to game";
         let BOOM_MESSAGE = "BOOOM!  (press 'r' to restart)";
         let CONGRATS_MESSAGE = "Congratulations!";
         
@@ -207,7 +207,7 @@ class NandMines {
         }else{
             let k = j - 1;
         }
-        while((k<Model.getRows()) & (k> - 1)){
+        while((k < Model.getRows()) & (k > - 1)){
             let s = model.getSquare(i,k);
             if(s.isHidden()){
                 do paintSquare(ci,cj);
