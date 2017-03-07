@@ -168,7 +168,11 @@
         }
 
         function GenerateCodeLine(row, value) {
-            str = "\tdo Memory.poke(memAddress+" + row*32 + ", " + value + ");\n";
+			if (value == -32768){ 
+				str = "\tdo Memory.poke(memAddress+" + row*32 + ", ~32767);\n"; 
+			} else {
+				str = "\tdo Memory.poke(memAddress+" + row*32 + ", " + value + ");\n";
+			}
             return str;
         }
     </script>
