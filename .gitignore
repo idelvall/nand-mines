@@ -1,1 +1,4 @@
-*.vm
+if (value == -32768) 
+    generateCode.value = generateCode.value + "\tdo Memory.poke(memAddress+" + row*32 + ", ~32767);\n"; 
+else
+    generateCode.value = generateCode.value + GenerateCodeLine(i, value);
