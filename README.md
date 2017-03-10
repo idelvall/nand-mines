@@ -1,6 +1,9 @@
 # NAND Mines
 Minesweeper for the Hack machine implemented in Jack language. 
 
+![nand-mines board](img/nand-mines.gif)
+![nand-mines help](img/nand-mines-help.gif)
+
 **Nand2Tetris** is an online, self-teachable course on Building a Modern Computer from First Principles http://www.nand2tetris.org/.
 
 This was my project submission for the module 9, a game implemented in the Jack language, a minimalist high level, OO language we have implemented for the Hack machine, a 16-bit hardware wachine we had previously built starting from the very ground: logical NAND gates.
@@ -8,18 +11,11 @@ This was my project submission for the module 9, a game implemented in the Jack 
 
 Table of Contents
 =================
-* [Screenshots](#screenshots)
 * [General execution instructions](#general-execution-instructions)
 * [Acknowledgements](#acknowledgements)
 * [Support bugs and requests](#support-bugs-and-requests)
 * [Authors](#authors)
 * [License](#license)
-
-##Screenshots
-###Gameplay
-![nand-mines board](img/nand-mines.gif)
-###Help
-![nand-mines help](img/nand-mines-help.gif)
 
 ## General execution instructions
 
