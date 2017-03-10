@@ -8,12 +8,18 @@ This was my project submission for the module 9, a game implemented in the Jack 
 
 Table of Contents
 =================
-* [General execution instructions](#general-execution-instructions)
 * [Screenshots](#screenshots)
+* [General execution instructions](#general-execution-instructions)
 * [Acknowledgements](#acknowledgements)
 * [Support bugs and requests](#support-bugs-and-requests)
 * [Authors](#authors)
 * [License](#license)
+
+##Screenshots
+###Gameplay
+![nand-mines board](img/nand-mines.gif)
+###Help
+![nand-mines help](img/nand-mines-help.gif)
 
 ## General execution instructions
 
@@ -26,11 +32,6 @@ Table of Contents
  - Set the speed slider to "Fast" (not necessary for all demos).
  - Press "F5" to run.
  
-##Screenshots
-###Gameplay
-![nand-mines board](img/nand-mines.gif)
-###Help
-![nand-mines help](img/nand-mines-help.gif)
 ##Acknowledgements
 - Thanks to all the [nand2tetris crew](http://www.nand2tetris.org/team.php) for the best learning experience of my life.
 - This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation. Thanks Gavin Stewart for your amazing work.
