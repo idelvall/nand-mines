@@ -1,10 +1,12 @@
 # NAND Mines
 Minesweeper for the Hack machine implemented in Jack language. 
+<p align="center">
+    <img src="https://github.com/idelvall/nand-mines/raw/master/img/nand-mines.gif" alt="NAND Mines board">
+</p>
 
-![nand-mines board](img/nand-mines.gif)
-
-
-![nand-mines help](img/nand-mines-help.gif)
+<p align="center">
+    <img src="https://github.com/idelvall/nand-mines/raw/master/img/nand-mines-help.gif" alt="NAND Mines help">
+</p>
 
 **Nand2Tetris** is an online, self-teachable course on Building a Modern Computer from First Principles http://www.nand2tetris.org/.
 
