@@ -2,6 +2,8 @@
 Minesweeper for the Hack machine implemented in Jack language. 
 
 ![nand-mines board](img/nand-mines.gif)
+
+
 ![nand-mines help](img/nand-mines-help.gif)
 
 **Nand2Tetris** is an online, self-teachable course on Building a Modern Computer from First Principles http://www.nand2tetris.org/.
