@@ -29,13 +29,13 @@ Table of Contents
  - Using File -> Load Program, select the application's directory and click the "Load Program" button.
  - Click the "Yes" button to the Confirmation Message pop-up.
  - Set the Animate: drop-down to "No animation".
- - Set the speed slider to "Fast" (not necessary for all demos).
+ - Set the speed slider to "Fast".
  - Press "F5" to run.
  
 ##Acknowledgements
-- Thanks to all the [nand2tetris crew](http://www.nand2tetris.org/team.php) for the best learning experience of my life.
-- This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation. Thanks Gavin Stewart for your amazing work.
-- Thanks to Golan Parashi for the [Sokoban bitmap editor](https://github.com/idelvall/nand-mines/tree/master/tools/BitmapEditor).
+- Thanks to all the [nand2tetris crew](http://www.nand2tetris.org/team.php) for this amazing learning experience!.
+- This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation. Thanks Gavin Stewart for sharing your great work!
+- Thanks to Golan Parashi for the [Sokoban bitmap editor](https://github.com/idelvall/nand-mines/tree/master/tools/BitmapEditor)!
 
 ## Support bugs and requests
 https://github.com/idelvall/nand-mines/issues
