@@ -1,0 +1,5 @@
+function Main.main 0
+call NandMines.run 0
+pop temp 0
+push constant 0
+return

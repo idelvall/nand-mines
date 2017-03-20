@@ -1,0 +1,290 @@
+function Model.init 0
+push constant 30
+pop static 1
+push constant 11
+pop static 2
+push static 1
+push static 2
+call Math.multiply 2
+pop static 0
+push constant 0
+return
+function Model.new 1
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push static 0
+call Array.new 1
+pop this 0
+push constant 0
+pop local 0
+label WHILE_0
+push local 0
+push static 0
+lt
+not
+if-goto END_WHILE_0
+push local 0
+call Square.new 1
+push this 0
+push local 0
+add
+pop pointer 1
+pop that 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_0
+label END_WHILE_0
+push pointer 0
+return
+function Model.getColumns 0
+push static 1
+return
+function Model.getRows 0
+push static 2
+return
+function Model.getId 0
+push argument 0
+push constant 0
+lt
+if-goto IF_1
+goto ENDIF_1
+label IF_1
+push constant 1
+neg
+return
+label ENDIF_1
+push argument 1
+push constant 0
+lt
+if-goto IF_2
+goto ENDIF_2
+label IF_2
+push constant 1
+neg
+return
+label ENDIF_2
+push argument 0
+push static 1
+push constant 1
+sub
+gt
+if-goto IF_3
+goto ENDIF_3
+label IF_3
+push constant 1
+neg
+return
+label ENDIF_3
+push argument 1
+push static 2
+push constant 1
+sub
+gt
+if-goto IF_4
+goto ENDIF_4
+label IF_4
+push constant 1
+neg
+return
+label ENDIF_4
+push argument 1
+push static 1
+call Math.multiply 2
+push argument 0
+add
+return
+function Model.getColumn 0
+push argument 0
+push static 1
+push argument 0
+call Model.getRow 1
+call Math.multiply 2
+sub
+return
+function Model.getRow 0
+push argument 0
+push static 1
+call Math.divide 2
+return
+function Model.setBombs 4
+push argument 0
+pop pointer 0
+push argument 1
+pop this 1
+push constant 0
+pop local 0
+push argument 2
+push static 0
+push constant 1
+sub
+call Random.new 2
+pop local 2
+label WHILE_5
+push local 0
+push argument 1
+lt
+not
+if-goto END_WHILE_5
+push local 2
+call Random.next 1
+pop local 1
+push this 0
+push local 1
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 3
+call Square.isBomb 1
+not
+if-goto IF_6
+push local 2
+call Random.dispose 1
+pop temp 0
+push local 1
+push constant 757
+add
+push static 0
+push constant 1
+sub
+call Random.new 2
+pop local 2
+goto ENDIF_6
+label IF_6
+push local 3
+push constant 1
+neg
+call Square.setBomb 2
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+label ENDIF_6
+goto WHILE_5
+label END_WHILE_5
+push local 2
+call Random.dispose 1
+pop temp 0
+push constant 0
+return
+function Model.getBombs 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Model.getSquareById 0
+push argument 0
+pop pointer 0
+push argument 1
+push constant 0
+lt
+if-goto IF_7
+goto ENDIF_7
+label IF_7
+push constant 0
+return
+label ENDIF_7
+push argument 1
+push static 0
+gt
+if-goto IF_8
+goto ENDIF_8
+label IF_8
+push constant 0
+return
+label ENDIF_8
+push this 0
+push argument 1
+add
+pop pointer 1
+push that 0
+return
+function Model.getSquare 0
+push argument 0
+pop pointer 0
+push argument 1
+push constant 0
+lt
+if-goto IF_9
+goto ENDIF_9
+label IF_9
+push constant 0
+return
+label ENDIF_9
+push argument 2
+push constant 0
+lt
+if-goto IF_10
+goto ENDIF_10
+label IF_10
+push constant 0
+return
+label ENDIF_10
+push argument 1
+push static 1
+push constant 1
+sub
+gt
+if-goto IF_11
+goto ENDIF_11
+label IF_11
+push constant 0
+return
+label ENDIF_11
+push argument 2
+push static 2
+push constant 1
+sub
+gt
+if-goto IF_12
+goto ENDIF_12
+label IF_12
+push constant 0
+return
+label ENDIF_12
+push this 0
+push argument 1
+push argument 2
+call Model.getId 2
+add
+pop pointer 1
+push that 0
+return
+function Model.dispose 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_13
+push local 0
+push static 0
+lt
+not
+if-goto END_WHILE_13
+push this 0
+push local 0
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 1
+call Square.dispose 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_13
+label END_WHILE_13
+push this 0
+call Array.dispose 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

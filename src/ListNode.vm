@@ -1,0 +1,56 @@
+function ListNode.new 0
+push constant 3
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push constant 0
+pop this 2
+push constant 0
+pop this 1
+push pointer 0
+return
+function ListNode.setValue 0
+push argument 0
+pop pointer 0
+push argument 1
+pop this 0
+push constant 0
+return
+function ListNode.setNext 0
+push argument 0
+pop pointer 0
+push argument 1
+pop this 2
+push constant 0
+return
+function ListNode.setPrevious 0
+push argument 0
+pop pointer 0
+push argument 1
+pop this 1
+push constant 0
+return
+function ListNode.getPrevious 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function ListNode.getValue 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function ListNode.getNext 0
+push argument 0
+pop pointer 0
+push this 2
+return
+function ListNode.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

@@ -129,7 +129,7 @@ class Image {
     
     /** Bitmap getters. */
     method Array getBitmap () { return bitmap; }
-    method ing getLength () { return bitmapLength; }
+    method int getLength () { return bitmapLength; }
     method int getWidth () { return bitmapWidth; }
     method int getHeight () { return bitmapHeight; }
     

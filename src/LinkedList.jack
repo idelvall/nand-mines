@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2017 Ignacio del Valle Alles idelvall@brutusin.org.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
  * Minimalist double-linked list implementation.
  */
 class LinkedList {
@@ -29,7 +29,7 @@ class LinkedList {
         return this;
     }
     
-    /* Adds the item at the beginning of the list. */
+    /** Adds the item at the beginning of the list. */
     method void addFirst(int value){
         var ListNode node;
         let node = ListNode.new(value);
@@ -43,7 +43,7 @@ class LinkedList {
         return;
     }
     
-    /* Adds the item at the end of the list. */
+    /** Adds the item at the end of the list. */
     method void addLast(int value){
         var ListNode node;
         let node = ListNode.new(value);
@@ -57,7 +57,7 @@ class LinkedList {
         return;
     }
     
-   /* Removes and returns the first item of the list. */
+   /** Removes and returns the first item of the list. */
     method int removeFirst(){
         var ListNode temp;
         var int ret;
@@ -76,7 +76,7 @@ class LinkedList {
         return ret;
     }
     
-    /* Removes and returns the first item of the list. */
+    /** Removes and returns the first item of the list. */
     method int removeLast(){
         var ListNode temp;
         var int ret;
@@ -95,12 +95,12 @@ class LinkedList {
         return ret;
     }
  
-    /* Returns the number of elements in the list. */
+    /** Returns the number of elements in the list. */
     method int getSize(){
         return size;
     }
     
-    /* Disposes the instance. */
+    /** Disposes the instance. */
     method void dispose () {
         var ListNode node, temp;
         let node = first;

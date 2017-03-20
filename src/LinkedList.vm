@@ -1,0 +1,173 @@
+function LinkedList.new 0
+push constant 3
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+pop this 0
+push constant 0
+pop this 2
+push pointer 0
+return
+function LinkedList.addFirst 1
+push argument 0
+pop pointer 0
+push argument 1
+call ListNode.new 1
+pop local 0
+push this 2
+push constant 0
+eq
+if-goto IF_0
+push local 0
+push this 0
+call ListNode.setNext 2
+pop temp 0
+goto ENDIF_0
+label IF_0
+push local 0
+pop this 1
+label ENDIF_0
+push local 0
+pop this 0
+push this 2
+push constant 1
+add
+pop this 2
+push constant 0
+return
+function LinkedList.addLast 1
+push argument 0
+pop pointer 0
+push argument 1
+call ListNode.new 1
+pop local 0
+push this 2
+push constant 0
+eq
+if-goto IF_1
+push this 1
+push local 0
+call ListNode.setNext 2
+pop temp 0
+goto ENDIF_1
+label IF_1
+push local 0
+pop this 0
+label ENDIF_1
+push local 0
+pop this 1
+push this 2
+push constant 1
+add
+pop this 2
+push constant 0
+return
+function LinkedList.removeFirst 2
+push argument 0
+pop pointer 0
+push this 0
+push constant 0
+eq
+if-goto IF_2
+push this 0
+call ListNode.getValue 1
+pop local 1
+push this 0
+pop local 0
+push this 0
+call ListNode.getNext 1
+pop this 0
+push local 0
+call ListNode.dispose 1
+pop temp 0
+push this 2
+push constant 1
+sub
+pop this 2
+push this 2
+push constant 0
+eq
+if-goto IF_3
+goto ENDIF_3
+label IF_3
+push constant 0
+pop this 1
+label ENDIF_3
+goto ENDIF_2
+label IF_2
+push constant 1
+neg
+pop local 1
+label ENDIF_2
+push local 1
+return
+function LinkedList.removeLast 2
+push argument 0
+pop pointer 0
+push this 1
+push constant 0
+eq
+if-goto IF_4
+push this 1
+call ListNode.getValue 1
+pop local 1
+push this 1
+pop local 0
+push this 1
+call ListNode.getPrevious 1
+pop this 1
+push local 0
+call ListNode.dispose 1
+pop temp 0
+push this 2
+push constant 1
+sub
+pop this 2
+push this 2
+push constant 0
+eq
+if-goto IF_5
+goto ENDIF_5
+label IF_5
+push constant 0
+pop this 0
+label ENDIF_5
+goto ENDIF_4
+label IF_4
+push constant 1
+neg
+pop local 1
+label ENDIF_4
+push local 1
+return
+function LinkedList.getSize 0
+push argument 0
+pop pointer 0
+push this 2
+return
+function LinkedList.dispose 2
+push argument 0
+pop pointer 0
+push this 0
+pop local 0
+push local 0
+push constant 0
+eq
+not
+if-goto IF_6
+goto ENDIF_6
+label IF_6
+push local 0
+pop local 1
+push local 0
+call ListNode.getNext 1
+pop local 0
+push local 1
+call ListNode.dispose 1
+pop temp 0
+label ENDIF_6
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

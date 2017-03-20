@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2017 Ignacio del Valle Alles idelvall@brutusin.org.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
  * NandMines data model. Basically consisting in an array of Square instances and some accession helper methods
  * Overall the application (i,j) indexes are used for columns and rows respectively, starting from 0.
  */
