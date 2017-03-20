@@ -32,7 +32,7 @@ Table of Contents
  - Set the speed slider to "Fast".
  - Press "F5" to run.
  
-##Acknowledgements
+## Acknowledgements
 - Thanks to all the [nand2tetris crew](http://www.nand2tetris.org/team.php) for this amazing learning experience!.
 - This game makes use of some classes of [Nand2Tetris-Games_and_Demos](https://github.com/gav-/Nand2Tetris-Games_and_Demos) for image generation. Thanks Gavin Stewart for sharing your great work!
 - Thanks to Golan Parashi for the [Sokoban bitmap editor](https://github.com/idelvall/nand-mines/tree/master/tools/BitmapEditor)!
@@ -46,7 +46,7 @@ https://github.com/idelvall/nand-mines/issues
 
 Contributions are always welcome and greatly appreciated!
 
-##License
+## License
 Apache License, Version 2.0
 
 
