@@ -89,8 +89,8 @@ class NandMines {
                 if (key = 131) { do nandMines.moveVertical(false);}    // up arrow
                 if (key = 132) { do nandMines.moveHorizontal(true); }  // right arrow
                 if (key = 133) { do nandMines.moveVertical(true); }    // down arrow
-                if (key = 139) { do nandMines.clearSquare(); }         // supr key
-                if (key = 138) { do nandMines.toggleFlag(); }          // insert key
+                if ((key = 129)|(key = 139)) { do nandMines.clearSquare(); } // del/backspace key
+                if ((key = 128)|(key = 138)) { do nandMines.toggleFlag(); } // ins/enter key
             }
             let key = 0;
         } 
