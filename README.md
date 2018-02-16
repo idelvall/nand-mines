@@ -1,5 +1,8 @@
 # NAND Mines
-Minesweeper for the Hack machine implemented in Jack language. 
+Minesweeper for the Hack machine implemented in Jack language.
+
+Video: https://youtu.be/SpAAYjXAtJ0
+
 <p align="center">
     <img src="https://github.com/idelvall/nand-mines/raw/master/img/nand-mines.gif" alt="NAND Mines board">
 </p>
